@@ -1,0 +1,19 @@
+{
+  "report_directory": "D:\\ViaPPS_RBS\\REPORT_DATA3",
+  "default_language": "en",
+  "default_interval_m": 1,
+  "available_intervals_m": [
+    1,
+    5,
+    20,
+    100
+  ],
+  "map_tiles": "CartoDB positron",
+  "chart_template": "plotly_white",
+  "default_crs": "EPSG:4326",
+  "max_map_points": 12000,
+  "default_selected_fields": [
+    "CEN 13036 Max spordybde [mm]",
+    "CEN 13036 Tverrfall [%]"
+  ]
+}

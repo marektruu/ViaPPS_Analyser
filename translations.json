@@ -1,0 +1,941 @@
+{
+  "fields": {
+    "Areal [cm^2]": {
+      "no": "Areal [cm^2]",
+      "en": "Area [cm^2]",
+      "et": "Roopa pindala [cm^2]"
+    },
+    "Avstand": {
+      "no": "Avstand",
+      "en": "Distance",
+      "et": "Vahemaa"
+    },
+    "Beregningsmetode []": {
+      "no": "Beregningsmetode []",
+      "en": "Calculation method []",
+      "et": "Arvutusmeetod []"
+    },
+    "Breddegrad": {
+      "no": "Breddegrad",
+      "en": "Latitude",
+      "et": "Laiuskraad"
+    },
+    "Breddegrad []": {
+      "no": "Breddegrad []",
+      "en": "Latitude []",
+      "et": "Laiuskraad []"
+    },
+    "Bunn Areal [cm^2]": {
+      "no": "Bunn Areal [cm^2]",
+      "en": "Bunn Area [cm^2]",
+      "et": "Bunn Roopa pindala [cm^2]"
+    },
+    "Bunn Hyre spordybde [mm]": {
+      "no": "Bunn Hyre spordybde [mm]",
+      "en": "Bunn Rut depth right [mm]",
+      "et": "Bunn Roopa sügavus paremal [mm]"
+    },
+    "Bunn Hyre sporposisjon [cm]": {
+      "no": "Bunn Hyre sporposisjon [cm]",
+      "en": "Bunn Rut position right [cm]",
+      "et": "Bunn Roopa asukoht paremal [cm]"
+    },
+    "Bunn Max spordybde [mm]": {
+      "no": "Bunn Max spordybde [mm]",
+      "en": "Bunn Rut depth max [mm]",
+      "et": "Bunn Roopa sügavus max [mm]"
+    },
+    "Bunn Max sporposisjon [cm]": {
+      "no": "Bunn Max sporposisjon [cm]",
+      "en": "Bunn Rut position max [cm]",
+      "et": "Bunn Roopa asukoht max [cm]"
+    },
+    "Bunn Sporbredde [cm]": {
+      "no": "Bunn Sporbredde [cm]",
+      "en": "Bunn Rut width [cm]",
+      "et": "Bunn Roopa laius [cm]"
+    },
+    "Bunn Tverrfall [%]": {
+      "no": "Bunn Tverrfall [%]",
+      "en": "Bunn Tverrfall [%]",
+      "et": "Bunn Põikkalle [%]"
+    },
+    "Bunn Venstre spordybde [mm]": {
+      "no": "Bunn Venstre spordybde [mm]",
+      "en": "Bunn Rut depth left [mm]",
+      "et": "Bunn Roopa sügavus vasakul [mm]"
+    },
+    "Bunn Venstre sporposisjon [cm]": {
+      "no": "Bunn Venstre sporposisjon [cm]",
+      "en": "Bunn Rut position left [cm]",
+      "et": "Bunn Roopa asukoht vasakul [cm]"
+    },
+    "CEN 13036 Areal [cm^2]": {
+      "no": "CEN 13036 Areal [cm^2]",
+      "en": "CEN 13036 Area [cm^2]",
+      "et": "CEN 13036 Roopa pindala [cm^2]"
+    },
+    "CEN 13036 Hyre spordybde [mm]": {
+      "no": "CEN 13036 Hyre spordybde [mm]",
+      "en": "CEN 13036 Rut depth right [mm]",
+      "et": "CEN 13036 Roopa sügavus paremal [mm]"
+    },
+    "CEN 13036 Hyre sporposisjon [cm]": {
+      "no": "CEN 13036 Hyre sporposisjon [cm]",
+      "en": "CEN 13036 Rut position right [cm]",
+      "et": "CEN 13036 Roopa asukoht paremal [cm]"
+    },
+    "CEN 13036 Max spordybde [mm]": {
+      "no": "CEN 13036 Max spordybde [mm]",
+      "en": "CEN 13036 Rut depth max [mm]",
+      "et": "CEN 13036 Roopa sügavus max [mm]"
+    },
+    "CEN 13036 Max sporposisjon [cm]": {
+      "no": "CEN 13036 Max sporposisjon [cm]",
+      "en": "CEN 13036 Rut position max [cm]",
+      "et": "CEN 13036 Roopa asukoht max [cm]"
+    },
+    "CEN 13036 Sporbredde [cm]": {
+      "no": "CEN 13036 Sporbredde [cm]",
+      "en": "CEN 13036 Rut width [cm]",
+      "et": "CEN 13036 Roopa laius [cm]"
+    },
+    "CEN 13036 Tverrfall [%]": {
+      "no": "CEN 13036 Tverrfall [%]",
+      "en": "CEN 13036 Tverrfall [%]",
+      "et": "CEN 13036 Põikkalle [%]"
+    },
+    "CEN 13036 Venstre spordybde [mm]": {
+      "no": "CEN 13036 Venstre spordybde [mm]",
+      "en": "CEN 13036 Rut depth left [mm]",
+      "et": "CEN 13036 Roopa sügavus vasakul [mm]"
+    },
+    "CEN 13036 Venstre sporposisjon [cm]": {
+      "no": "CEN 13036 Venstre sporposisjon [cm]",
+      "en": "CEN 13036 Rut position left [cm]",
+      "et": "CEN 13036 Roopa asukoht vasakul [cm]"
+    },
+    "Dato": {
+      "no": "Dato",
+      "en": "Date",
+      "et": "Kuupäev"
+    },
+    "File name": {
+      "no": "File name",
+      "en": "File name",
+      "et": "Failinimi"
+    },
+    "Filnavn": {
+      "no": "Filnavn",
+      "en": "Filnavn",
+      "et": "Failinimi"
+    },
+    "Fra strekning []": {
+      "no": "Fra strekning []",
+      "en": "From roadsection []",
+      "et": "Algus TO []"
+    },
+    "Fra vegmeter [m]": {
+      "no": "Fra vegmeter [m]",
+      "en": "From roadmeter [m]",
+      "et": "Algus meeter [m]"
+    },
+    "Hastighet": {
+      "no": "Hastighet",
+      "en": "Speed",
+      "et": "Kiirus"
+    },
+    "Hastighet [km/t]": {
+      "no": "Hastighet [km/t]",
+      "en": "Speed [km/t]",
+      "et": "Kiirus [km/t]"
+    },
+    "Hyde [m]": {
+      "no": "Hyde [m]",
+      "en": "Height [m]",
+      "et": "Kõrgus [m]"
+    },
+    "Hyre spordybde [mm]": {
+      "no": "Hyre spordybde [mm]",
+      "en": "Rut depth right [mm]",
+      "et": "Roopa sügavus paremal [mm]"
+    },
+    "Hyre sporposisjon [cm]": {
+      "no": "Hyre sporposisjon [cm]",
+      "en": "Rut position right [cm]",
+      "et": "Roopa asukoht paremal [cm]"
+    },
+    "Kommentar": {
+      "no": "Kommentar",
+      "en": "Comment",
+      "et": "Kommentaar"
+    },
+    "Krum Areal [cm^2]": {
+      "no": "Krum Areal [cm^2]",
+      "en": "Krum Area [cm^2]",
+      "et": "Krum Roopa pindala [cm^2]"
+    },
+    "Krum Hyre spordybde [mm]": {
+      "no": "Krum Hyre spordybde [mm]",
+      "en": "Krum Rut depth right [mm]",
+      "et": "Krum Roopa sügavus paremal [mm]"
+    },
+    "Krum Hyre sporposisjon [cm]": {
+      "no": "Krum Hyre sporposisjon [cm]",
+      "en": "Krum Rut position right [cm]",
+      "et": "Krum Roopa asukoht paremal [cm]"
+    },
+    "Krum Max spordybde [mm]": {
+      "no": "Krum Max spordybde [mm]",
+      "en": "Krum Rut depth max [mm]",
+      "et": "Krum Roopa sügavus max [mm]"
+    },
+    "Krum Max sporposisjon [cm]": {
+      "no": "Krum Max sporposisjon [cm]",
+      "en": "Krum Rut position max [cm]",
+      "et": "Krum Roopa asukoht max [cm]"
+    },
+    "Krum Sporbredde [cm]": {
+      "no": "Krum Sporbredde [cm]",
+      "en": "Krum Rut width [cm]",
+      "et": "Krum Roopa laius [cm]"
+    },
+    "Krum Tverrfall [%]": {
+      "no": "Krum Tverrfall [%]",
+      "en": "Krum Tverrfall [%]",
+      "et": "Krum Põikkalle [%]"
+    },
+    "Krum Venstre spordybde [mm]": {
+      "no": "Krum Venstre spordybde [mm]",
+      "en": "Krum Rut depth left [mm]",
+      "et": "Krum Roopa sügavus vasakul [mm]"
+    },
+    "Krum Venstre sporposisjon [cm]": {
+      "no": "Krum Venstre sporposisjon [cm]",
+      "en": "Krum Rut position left [cm]",
+      "et": "Krum Roopa asukoht vasakul [cm]"
+    },
+    "Kurveradius [m]": {
+      "no": "Kurveradius [m]",
+      "en": "Kurveradius [m]",
+      "et": "Kurviraadius [m]"
+    },
+    "Kval. ekstra midtlinje [%]": {
+      "no": "Kval. ekstra midtlinje [%]",
+      "en": "Kval. ekstra midtlinje [%]",
+      "et": "Kval. ekstra midtlinje [%]"
+    },
+    "Kval. kantlinje [%]": {
+      "no": "Kval. kantlinje [%]",
+      "en": "Kval. kantlinje [%]",
+      "et": "Kval. kantlinje [%]"
+    },
+    "Kval. midtlinje [%]": {
+      "no": "Kval. midtlinje [%]",
+      "en": "Kval. midtlinje [%]",
+      "et": "Kval. midtlinje [%]"
+    },
+    "Lengdegrad": {
+      "no": "Lengdegrad",
+      "en": "Longitude",
+      "et": "Pikkuskraad"
+    },
+    "Lengdegrad []": {
+      "no": "Lengdegrad []",
+      "en": "Lengdegrad []",
+      "et": "Pikkuskraad []"
+    },
+    "Malingslengdem": {
+      "no": "Malingslengdem",
+      "en": "Measurement length",
+      "et": "Mõõtmispikkus"
+    },
+    "Max spordybde [mm]": {
+      "no": "Max spordybde [mm]",
+      "en": "Rut depth max [mm]",
+      "et": "Roopa sügavus max [mm]"
+    },
+    "Max sporposisjon [cm]": {
+      "no": "Max sporposisjon [cm]",
+      "en": "Rut position max [cm]",
+      "et": "Roopa asukoht max [cm]"
+    },
+    "Measurement length m": {
+      "no": "Measurement length m",
+      "en": "Measurement length m",
+      "et": "Measurement length m"
+    },
+    "Metode Areal [cm^2]": {
+      "no": "Metode Areal [cm^2]",
+      "en": "Metode Area [cm^2]",
+      "et": "Metode Roopa pindala [cm^2]"
+    },
+    "Metode Hyre spordybde [mm]": {
+      "no": "Metode Hyre spordybde [mm]",
+      "en": "Metode Rut depth right [mm]",
+      "et": "Metode Roopa sügavus paremal [mm]"
+    },
+    "Metode Hyre sporposisjon [cm]": {
+      "no": "Metode Hyre sporposisjon [cm]",
+      "en": "Metode Rut position right [cm]",
+      "et": "Metode Roopa asukoht paremal [cm]"
+    },
+    "Metode Max spordybde [mm]": {
+      "no": "Metode Max spordybde [mm]",
+      "en": "Metode Rut depth max [mm]",
+      "et": "Metode Roopa sügavus max [mm]"
+    },
+    "Metode Max sporposisjon [cm]": {
+      "no": "Metode Max sporposisjon [cm]",
+      "en": "Metode Rut position max [cm]",
+      "et": "Metode Roopa asukoht max [cm]"
+    },
+    "Metode Sporbredde [cm]": {
+      "no": "Metode Sporbredde [cm]",
+      "en": "Metode Rut width [cm]",
+      "et": "Metode Roopa laius [cm]"
+    },
+    "Metode Tverrfall [%]": {
+      "no": "Metode Tverrfall [%]",
+      "en": "Metode Tverrfall [%]",
+      "et": "Metode Põikkalle [%]"
+    },
+    "Metode Venstre spordybde [mm]": {
+      "no": "Metode Venstre spordybde [mm]",
+      "en": "Metode Rut depth left [mm]",
+      "et": "Metode Roopa sügavus vasakul [mm]"
+    },
+    "Metode Venstre sporposisjon [cm]": {
+      "no": "Metode Venstre sporposisjon [cm]",
+      "en": "Metode Rut position left [cm]",
+      "et": "Metode Roopa asukoht vasakul [cm]"
+    },
+    "Måling": {
+      "no": "Måling",
+      "en": "Measurement",
+      "et": "Mõõtmine"
+    },
+    "Opptaksdato": {
+      "no": "Opptaksdato",
+      "en": "Measurement time",
+      "et": "Mõõtmisaeg"
+    },
+    "Pause []": {
+      "no": "Pause []",
+      "en": "Pause []",
+      "et": "Paus []"
+    },
+    "Pos. ekstra midtlinje [cm]": {
+      "no": "Pos. ekstra midtlinje [cm]",
+      "en": "Pos. ekstra midtlinje [cm]",
+      "et": "Pos. ekstra midtlinje [cm]"
+    },
+    "Pos. kantlinje [cm]": {
+      "no": "Pos. kantlinje [cm]",
+      "en": "Pos. kantlinje [cm]",
+      "et": "Pos. kantlinje [cm]"
+    },
+    "Pos. midtlinje [cm]": {
+      "no": "Pos. midtlinje [cm]",
+      "en": "Pos. midtlinje [cm]",
+      "et": "Keskjoone asukoht [cm]"
+    },
+    "Rapportdato": {
+      "no": "Rapportdato",
+      "en": "Report timestamp",
+      "et": "Aruande aeg"
+    },
+    "Recording date": {
+      "no": "Recording date",
+      "en": "Recording timestamp",
+      "et": "Mõõtmise aeg"
+    },
+    "Regresjon Areal [cm^2]": {
+      "no": "Regresjon Areal [cm^2]",
+      "en": "Regresjon Area [cm^2]",
+      "et": "Regresjon Roopa pindala [cm^2]"
+    },
+    "Regresjon Hyre spordybde [mm]": {
+      "no": "Regresjon Hyre spordybde [mm]",
+      "en": "Regresjon Rut depth right [mm]",
+      "et": "Regresjon Roopa sügavus paremal [mm]"
+    },
+    "Regresjon Hyre sporposisjon [cm]": {
+      "no": "Regresjon Hyre sporposisjon [cm]",
+      "en": "Regresjon Rut position right [cm]",
+      "et": "Regresjon Roopa asukoht paremal [cm]"
+    },
+    "Regresjon Max spordybde [mm]": {
+      "no": "Regresjon Max spordybde [mm]",
+      "en": "Regresjon Rut depth max [mm]",
+      "et": "Regresjon Roopa sügavus max [mm]"
+    },
+    "Regresjon Max sporposisjon [cm]": {
+      "no": "Regresjon Max sporposisjon [cm]",
+      "en": "Regresjon Rut position max [cm]",
+      "et": "Regresjon Roopa asukoht max [cm]"
+    },
+    "Regresjon Sporbredde [cm]": {
+      "no": "Regresjon Sporbredde [cm]",
+      "en": "Regresjon Rut width [cm]",
+      "et": "Regresjon Roopa laius [cm]"
+    },
+    "Regresjon Tverrfall [%]": {
+      "no": "Regresjon Tverrfall [%]",
+      "en": "Regresjon Tverrfall [%]",
+      "et": "Regresjon Põikkalle [%]"
+    },
+    "Regresjon Venstre spordybde [mm]": {
+      "no": "Regresjon Venstre spordybde [mm]",
+      "en": "Regresjon Rut depth left [mm]",
+      "et": "Regresjon Roopa sügavus vasakul [mm]"
+    },
+    "Regresjon Venstre sporposisjon [cm]": {
+      "no": "Regresjon Venstre sporposisjon [cm]",
+      "en": "Regresjon Rut position left [cm]",
+      "et": "Regresjon Roopa asukoht vasakul [cm]"
+    },
+    "Report date": {
+      "no": "Report date",
+      "en": "Report date",
+      "et": "Report date"
+    },
+    "Signalkvalitet [%]": {
+      "no": "Signalkvalitet [%]",
+      "en": "Signalkvalitet [%]",
+      "et": "Signalkvalitet [%]"
+    },
+    "Snor Areal [cm^2]": {
+      "no": "Snor Areal [cm^2]",
+      "en": "Snor Area [cm^2]",
+      "et": "Snor Roopa pindala [cm^2]"
+    },
+    "Snor Hyre spordybde [mm]": {
+      "no": "Snor Hyre spordybde [mm]",
+      "en": "Snor Rut depth right [mm]",
+      "et": "Snor Roopa sügavus paremal [mm]"
+    },
+    "Snor Hyre sporposisjon [cm]": {
+      "no": "Snor Hyre sporposisjon [cm]",
+      "en": "Snor Rut position right [cm]",
+      "et": "Snor Roopa asukoht paremal [cm]"
+    },
+    "Snor Max spordybde [mm]": {
+      "no": "Snor Max spordybde [mm]",
+      "en": "Snor Rut depth max [mm]",
+      "et": "Snor Roopa sügavus max [mm]"
+    },
+    "Snor Max sporposisjon [cm]": {
+      "no": "Snor Max sporposisjon [cm]",
+      "en": "Snor Rut position max [cm]",
+      "et": "Snor Roopa asukoht max [cm]"
+    },
+    "Snor Sporbredde [cm]": {
+      "no": "Snor Sporbredde [cm]",
+      "en": "Snor Rut width [cm]",
+      "et": "Snor Roopa laius [cm]"
+    },
+    "Snor Tverrfall [%]": {
+      "no": "Snor Tverrfall [%]",
+      "en": "Snor Tverrfall [%]",
+      "et": "Snor Põikkalle [%]"
+    },
+    "Snor Venstre spordybde [mm]": {
+      "no": "Snor Venstre spordybde [mm]",
+      "en": "Snor Rut depth left [mm]",
+      "et": "Snor Roopa sügavus vasakul [mm]"
+    },
+    "Snor Venstre sporposisjon [cm]": {
+      "no": "Snor Venstre sporposisjon [cm]",
+      "en": "Snor Rut position left [cm]",
+      "et": "Snor Roopa asukoht vasakul [cm]"
+    },
+    "Sone 33V  [m]": {
+      "no": "Sone 33V  [m]",
+      "en": "Sone 33V  [m]",
+      "et": "Sone 33V  [m]"
+    },
+    "Sone 33V N [m]": {
+      "no": "Sone 33V N [m]",
+      "en": "Sone 33V N [m]",
+      "et": "Sone 33V N [m]"
+    },
+    "Spor": {
+      "no": "Spor",
+      "en": "Track",
+      "et": "Rada"
+    },
+    "Sporbredde [cm]": {
+      "no": "Sporbredde [cm]",
+      "en": "Rut width [cm]",
+      "et": "Roopa laius [cm]"
+    },
+    "Spordybde [mm]": {
+      "no": "Spordybde [mm]",
+      "en": "Spordybde [mm]",
+      "et": "Spordybde [mm]"
+    },
+    "Sporposisjon [cm]": {
+      "no": "Sporposisjon [cm]",
+      "en": "Sporposisjon [cm]",
+      "et": "Sporposisjon [cm]"
+    },
+    "Start position: County": {
+      "no": "Start position: County",
+      "en": "Start position: County",
+      "et": "Start position: County"
+    },
+    "Start position: Road": {
+      "no": "Start position: Road",
+      "en": "Start position: Road",
+      "et": "Start position: Road"
+    },
+    "Start position: Section": {
+      "no": "Start position: Section",
+      "en": "Start position: Section",
+      "et": "Start position: Section"
+    },
+    "Startposisjon: Fylke": {
+      "no": "Startposisjon: Fylke",
+      "en": "Startposisjon: Fylke",
+      "et": "Startposisjon: Fylke"
+    },
+    "Startposisjon: Strekning": {
+      "no": "Startposisjon: Strekning",
+      "en": "Startposisjon: Strekning",
+      "et": "Startposisjon: Strekning"
+    },
+    "Startposisjon: Veg": {
+      "no": "Startposisjon: Veg",
+      "en": "Startposisjon: Veg",
+      "et": "Startposisjon: Veg"
+    },
+    "Stasjon": {
+      "no": "Stasjon",
+      "en": "Station",
+      "et": "Jaam"
+    },
+    "Tid": {
+      "no": "Tid",
+      "en": "Time",
+      "et": "Aeg"
+    },
+    "Tid [ms]": {
+      "no": "Tid [ms]",
+      "en": "Tid [ms]",
+      "et": "Tid [ms]"
+    },
+    "Til strekning []": {
+      "no": "Til strekning []",
+      "en": "Til strekning []",
+      "et": "Til strekning []"
+    },
+    "Til vegmeter [m]": {
+      "no": "Til vegmeter [m]",
+      "en": "Til vegmeter [m]",
+      "et": "Til vegmeter [m]"
+    },
+    "Tverrfall [%]": {
+      "no": "Tverrfall [%]",
+      "en": "Tverrfall [%]",
+      "et": "Põikkalle [%]"
+    },
+    "Type ekstra midtlinje []": {
+      "no": "Type ekstra midtlinje []",
+      "en": "Type ekstra midtlinje []",
+      "et": "Type ekstra midtlinje []"
+    },
+    "Type kantlinje []": {
+      "no": "Type kantlinje []",
+      "en": "Type kantlinje []",
+      "et": "Type kantlinje []"
+    },
+    "Type midtlinje []": {
+      "no": "Type midtlinje []",
+      "en": "Type midtlinje []",
+      "et": "Type midtlinje []"
+    },
+    "Utkjrt meter [m]": {
+      "no": "Utkjrt meter [m]",
+      "en": "Utkjrt meter [m]",
+      "et": "Utkjrt meter [m]"
+    },
+    "Venstre spordybde [mm]": {
+      "no": "Venstre spordybde [mm]",
+      "en": "Rut depth left [mm]",
+      "et": "Roopa sügavus vasakul [mm]"
+    },
+    "Venstre sporposisjon [cm]": {
+      "no": "Venstre sporposisjon [cm]",
+      "en": "Rut position left [cm]",
+      "et": "Roopa asukoht vasakul [cm]"
+    }
+  },
+  "ui": {
+    "analysis_begin_m": {
+      "no": "Analyse start (m)",
+      "en": "Analysis begin (m)",
+      "et": "Analüüsi algus (m)"
+    },
+    "analysis_end_m": {
+      "no": "Analyse slutt (m)",
+      "en": "Analysis end (m)",
+      "et": "Analüüsi lõpp (m)"
+    },
+    "app_title": {
+      "no": "ViaPPS Analyzer",
+      "en": "ViaPPS Analyzer",
+      "et": "ViaPPS Analyzer"
+    },
+    "ascending": {
+      "no": "Stigende",
+      "en": "Ascending",
+      "et": "Kasvav"
+    },
+    "averaging_interval": {
+      "no": "Gjennomsnittsintervall",
+      "en": "Averaging interval",
+      "et": "Keskmistamise intervall"
+    },
+    "chart_export_note": {
+      "no": "PNG/PDF krever kaleido og støttet miljø.",
+      "en": "PNG/PDF export requires kaleido and a supported environment.",
+      "et": "PNG/PDF eksport vajab kaleido tuge ja sobivat keskkonda."
+    },
+    "chart_html": {
+      "no": "Diagram HTML",
+      "en": "Chart HTML",
+      "et": "Diagrammi HTML"
+    },
+    "chart_image_format": {
+      "no": "Bildeformat",
+      "en": "Chart image format",
+      "et": "Graafiku pildiformaat"
+    },
+    "comparison_csv": {
+      "no": "Sammenligning CSV",
+      "en": "Comparison CSV",
+      "et": "Võrdluse CSV"
+    },
+    "comparison_excel": {
+      "no": "Sammenligning Excel",
+      "en": "Comparison Excel",
+      "et": "Võrdluse Excel"
+    },
+    "comparison_mode": {
+      "no": "Sammenligningsmodus",
+      "en": "Comparison mode",
+      "et": "Võrdlusrežiim"
+    },
+    "configuration_saved": {
+      "no": "Konfigurasjon lagret.",
+      "en": "Configuration saved.",
+      "et": "Seadistus salvestatud."
+    },
+    "coordinate_filter": {
+      "no": "Koordinatfilter",
+      "en": "Coordinate filter",
+      "et": "Koordinaatide filter"
+    },
+    "correlation": {
+      "no": "Korrelasjon",
+      "en": "Correlation",
+      "et": "Korrelatsioon"
+    },
+    "correlation_summary": {
+      "no": "Korrelasjon",
+      "en": "Correlation",
+      "et": "Korrelatsioon"
+    },
+    "count": {
+      "no": "Antall",
+      "en": "Count",
+      "et": "Arv"
+    },
+    "date_filter": {
+      "no": "Datofilter",
+      "en": "Date filter",
+      "et": "Kuupäevafilter"
+    },
+    "descending": {
+      "no": "Synkende",
+      "en": "Descending",
+      "et": "Kahanev"
+    },
+    "difference_plot": {
+      "no": "Differanseplott",
+      "en": "Difference plot",
+      "et": "Erinevuste graafik"
+    },
+    "direction": {
+      "no": "Retning",
+      "en": "Direction",
+      "et": "Suund"
+    },
+    "download_chart_image": {
+      "no": "Last ned diagram",
+      "en": "Download chart image",
+      "et": "Laadi diagramm alla"
+    },
+    "download_track_export": {
+      "no": "Last ned sporeksport",
+      "en": "Download track export",
+      "et": "Laadi raja eksport alla"
+    },
+    "exports": {
+      "no": "Eksport",
+      "en": "Exports",
+      "et": "Eksport"
+    },
+    "field": {
+      "no": "Felt",
+      "en": "Field",
+      "et": "Väli"
+    },
+    "field_groups": {
+      "no": "Feltgrupper",
+      "en": "Field groups",
+      "et": "Väljarühmad"
+    },
+    "fields": {
+      "no": "Felter",
+      "en": "Fields",
+      "et": "Väljad"
+    },
+    "file": {
+      "no": "Fil",
+      "en": "File",
+      "et": "Fail"
+    },
+    "file_a": {
+      "no": "Fil A",
+      "en": "File A",
+      "et": "Fail A"
+    },
+    "file_b": {
+      "no": "Fil B",
+      "en": "File B",
+      "et": "Fail B"
+    },
+    "file_name": {
+      "no": "Filnavn",
+      "en": "File name",
+      "et": "Faili nimi"
+    },
+    "filters": {
+      "no": "Filtre",
+      "en": "Filters",
+      "et": "Filtrid"
+    },
+    "general_group": {
+      "no": "Generelt",
+      "en": "General",
+      "et": "?ldine"
+    },
+    "invalid_coordinate_bounds": {
+      "no": "Ugyldig koordinatgrenseformat.",
+      "en": "Invalid coordinate bounds format.",
+      "et": "Vigane koordinaatide piiride vorming."
+    },
+    "language": {
+      "no": "Språk",
+      "en": "Language",
+      "et": "Keel"
+    },
+    "linear_reference": {
+      "no": "Lineær referanse",
+      "en": "Linear reference",
+      "et": "Lineaarne viide"
+    },
+    "main_table_preview": {
+      "no": "Forhåndsvisning av hovedtabell",
+      "en": "Main table preview",
+      "et": "Põhitabeli eelvaade"
+    },
+    "map": {
+      "no": "Kart",
+      "en": "Map",
+      "et": "Kaart"
+    },
+    "map_render_failed": {
+      "no": "Kartvisning mislyktes",
+      "en": "Map rendering failed",
+      "et": "Kaardi kuvamine ebaõnnestus"
+    },
+    "max": {
+      "no": "Maksimum",
+      "en": "Max",
+      "et": "Max"
+    },
+    "mean": {
+      "no": "Gjennomsnitt",
+      "en": "Mean",
+      "et": "Keskmine"
+    },
+    "measurement_length_m": {
+      "no": "Malingslengdem",
+      "en": "Measurement length m",
+      "et": "Mõõtepikkus m"
+    },
+    "metadata": {
+      "no": "Metadata",
+      "en": "Metadata",
+      "et": "Metaandmed"
+    },
+    "min": {
+      "no": "Minimum",
+      "en": "Min",
+      "et": "Min"
+    },
+    "no_files_found": {
+      "no": "Ingen TSV/TXT-filer funnet i",
+      "en": "No TSV/TXT files found in",
+      "et": "TSV/TXT faile ei leitud kaustast"
+    },
+    "overlap_count": {
+      "no": "Overlappende punkter",
+      "en": "Overlap count",
+      "et": "Kattuvate punktide arv"
+    },
+    "overlay": {
+      "no": "Overlegg",
+      "en": "Overlay",
+      "et": "Kattekihi vaade"
+    },
+    "prepare_chart_image": {
+      "no": "Forbered diagramfil",
+      "en": "Prepare chart image",
+      "et": "Valmista diagrammi pilt"
+    },
+    "prepare_track_export": {
+      "no": "Forbered sporeksport",
+      "en": "Prepare track export",
+      "et": "Valmista raja eksport"
+    },
+    "preview_file": {
+      "no": "Forhåndsvis fil",
+      "en": "Preview file",
+      "et": "Eelvaate fail"
+    },
+    "raw_metadata": {
+      "no": "Råmetadata",
+      "en": "Raw metadata",
+      "et": "Toormetaandmed"
+    },
+    "recording_date": {
+      "no": "Opptaksdato",
+      "en": "Recording date",
+      "et": "Salvestuse kuupäev"
+    },
+    "refresh_files": {
+      "no": "Oppdater filer",
+      "en": "Refresh files",
+      "et": "Värskenda faile"
+    },
+    "refresh_to_load_files": {
+      "no": "Velg rapportmappe og trykk Oppdater filer for å vise filene.",
+      "en": "Choose the report directory and press Refresh files to show the files.",
+      "et": "Vali raportite kaust ja vajuta failide kuvamiseks Värskenda faile."
+    },
+    "report_date": {
+      "no": "Rapportdato",
+      "en": "Report date",
+      "et": "Raporti kuupäev"
+    },
+    "report_directory": {
+      "no": "Rapportmappe",
+      "en": "Report directory",
+      "et": "Raportite kaust"
+    },
+    "road_meter": {
+      "no": "Veimeter",
+      "en": "Road meter",
+      "et": "Teemeeter"
+    },
+    "save_settings": {
+      "no": "Lagre innstillinger",
+      "en": "Save settings",
+      "et": "Salvesta seaded"
+    },
+    "save_translations": {
+      "no": "Lagre oversettelser",
+      "en": "Save translations",
+      "et": "Salvesta tõlked"
+    },
+    "select_fields_prompt": {
+      "no": "Velg ett eller flere numeriske felter for visualisering.",
+      "en": "Select one or more numeric fields to visualize.",
+      "et": "Vali visualiseerimiseks üks või mitu numbrilist välja."
+    },
+    "select_file_prompt": {
+      "no": "Velg minst én fil for analyse.",
+      "en": "Select at least one file to start analysis.",
+      "et": "Vali analüüsi alustamiseks vähemalt üks fail."
+    },
+    "selected_files": {
+      "no": "Valgte filer",
+      "en": "Selected files",
+      "et": "Valitud failid"
+    },
+    "series": {
+      "no": "Serier",
+      "en": "Series",
+      "et": "Seeriad"
+    },
+    "settings": {
+      "no": "Innstillinger",
+      "en": "Settings",
+      "et": "Seaded"
+    },
+    "side_by_side": {
+      "no": "Side om side",
+      "en": "Side by side",
+      "et": "Kõrvuti"
+    },
+    "start_county": {
+      "no": "Startposisjon: Fylke",
+      "en": "Start position: County",
+      "et": "Alguspositsioon: maakond"
+    },
+    "start_meter": {
+      "no": "Startmeter",
+      "en": "Start meter",
+      "et": "Algusmeeter"
+    },
+    "start_road": {
+      "no": "Startposisjon: Veg",
+      "en": "Start position: Road",
+      "et": "Alguspositsioon: tee"
+    },
+    "start_section": {
+      "no": "Startposisjon: Strekning",
+      "en": "Start position: Section",
+      "et": "Alguspositsioon: lõik"
+    },
+    "std": {
+      "no": "Standardavvik",
+      "en": "Std",
+      "et": "Std"
+    },
+    "summary": {
+      "no": "Sammendrag",
+      "en": "Summary",
+      "et": "Kokkuvõte"
+    },
+    "track_export_format": {
+      "no": "Spor-eksportformat",
+      "en": "Track export format",
+      "et": "Raja ekspordivorming"
+    },
+    "translation_editor": {
+      "no": "Oversettelsesredigering",
+      "en": "Translation editor",
+      "et": "Tõlkeredaktor"
+    },
+    "value": {
+      "no": "Verdi",
+      "en": "Value",
+      "et": "Väärtus"
+    }
+  }
+}
