@@ -40,7 +40,7 @@ from viapps_analyzer.translations import (
 )
 
 
-st.set_page_config(page_title="ViaPPS Analyzer", layout="wide")
+st.set_page_config(page_title="ViaPPS Analyzer +", layout="wide")
 
 METHOD_GROUPS = ["CEN 13036", "Bunn", "Krum", "Metode", "Regresjon", "Snor"]
 GENERAL_GROUP_KEY = "general"
