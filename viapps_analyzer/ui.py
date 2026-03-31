@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 from streamlit_folium import st_folium
 
 from viapps_analyzer.analyzer import (
@@ -25,6 +26,7 @@ from viapps_analyzer.data_loader import (
     list_tsv_files,
     numeric_fields,
     parse_report,
+    parse_report_bytes,
 )
 from viapps_analyzer.map_utils import build_map, export_tracks
 from viapps_analyzer.plotting import build_comparison_figure, build_individual_figure, export_plot_html, export_plot_image
@@ -65,6 +67,11 @@ def cached_file_list(directory: str) -> list[str]:
 @st.cache_data(show_spinner=False)
 def cached_report(path: str) -> ViaPPSReport:
     return parse_report(path)
+
+
+@st.cache_data(show_spinner=False)
+def cached_uploaded_report(name: str, data: bytes) -> ViaPPSReport:
+    return parse_report_bytes(name, data)
 
 
 def _localized_fields(translations: dict, language: str, fields: list[str]) -> dict[str, str]:
@@ -111,17 +118,17 @@ def _localize_summary_dataframe(df: pd.DataFrame, translations: dict, language: 
     return localized
 
 
-def _build_file_label_map(paths: list[str]) -> dict[str, str]:
-    labels: dict[str, str] = {}
+def _build_label_map(reports: list[ViaPPSReport]) -> dict[str, ViaPPSReport]:
+    labels: dict[str, ViaPPSReport] = {}
     counts: dict[str, int] = {}
-    display_names = {path: cached_report(path).display_name for path in paths}
+    display_names = {report.path.name: report.display_name for report in reports}
     for display_name in display_names.values():
         counts[display_name] = counts.get(display_name, 0) + 1
-    for path in paths:
-        display_name = display_names[path]
+    for report in reports:
+        display_name = display_names[report.path.name]
         if counts[display_name] > 1:
-            display_name = f"{display_name} ({Path(path).name})"
-        labels[display_name] = path
+            display_name = f"{display_name} ({report.path.name})"
+        labels[display_name] = report
     return labels
 
 
@@ -309,6 +316,17 @@ def _ensure_report_header_translations(translations: dict, reports: dict[str, Vi
     return updated
 
 
+def _load_directory_reports(directory: str) -> list[ViaPPSReport]:
+    return [cached_report(path) for path in cached_file_list(directory)]
+
+
+def _load_uploaded_reports(uploaded_files: list[UploadedFile]) -> list[ViaPPSReport]:
+    reports: list[ViaPPSReport] = []
+    for uploaded_file in uploaded_files:
+        reports.append(cached_uploaded_report(uploaded_file.name, uploaded_file.getvalue()))
+    return reports
+
+
 def run_app() -> None:
     config = load_config()
     translations = load_translations()
@@ -320,20 +338,8 @@ def run_app() -> None:
         st.session_state.report_directory_input = config.report_directory
     if "files_loaded" not in st.session_state:
         st.session_state.files_loaded = False
-    if "file_paths" not in st.session_state:
-        st.session_state.file_paths = []
-
-    report_directory = st.sidebar.text_input(
-        tr(translations, config.default_language, "report_directory"),
-        value=st.session_state.report_directory_input,
-        key="report_directory_input",
-    )
-    if st.sidebar.button(tr(translations, config.default_language, "refresh_files")):
-        cached_file_list.clear()
-        cached_report.clear()
-        st.session_state.file_paths = cached_file_list(report_directory)
-        st.session_state.files_loaded = True
-        config = _persist_report_directory(config, report_directory)
+    if "directory_reports" not in st.session_state:
+        st.session_state.directory_reports = []
 
     language = st.sidebar.selectbox(
         tr(translations, config.default_language, "language"),
@@ -342,18 +348,46 @@ def run_app() -> None:
     )
     st.title(tr(translations, language, "app_title"))
 
-    if not st.session_state.files_loaded:
-        st.info(tr(translations, language, "refresh_to_load_files"))
-        _render_translation_editor(translations, language)
-        return
+    data_source = st.sidebar.radio(
+        tr(translations, language, "data_source"),
+        options=["upload", "directory"],
+        format_func=lambda option: tr(translations, language, "upload_files") if option == "upload" else tr(translations, language, "local_directory"),
+    )
 
-    files = list(st.session_state.file_paths)
-    if not files:
-        st.warning(f"{tr(translations, language, 'no_files_found')} {report_directory}")
-        _render_translation_editor(translations, language)
-        return
+    if data_source == "upload":
+        uploaded_files = st.sidebar.file_uploader(
+            tr(translations, language, "upload_reports"),
+            type=["txt", "tsv"],
+            accept_multiple_files=True,
+        )
+        available_reports = _load_uploaded_reports(uploaded_files or [])
+        if not available_reports:
+            st.info(tr(translations, language, "upload_files_prompt"))
+            _render_translation_editor(translations, language)
+            return
+    else:
+        report_directory = st.sidebar.text_input(
+            tr(translations, language, "report_directory"),
+            value=st.session_state.report_directory_input,
+            key="report_directory_input",
+        )
+        if st.sidebar.button(tr(translations, language, "refresh_files")):
+            cached_file_list.clear()
+            cached_report.clear()
+            st.session_state.directory_reports = _load_directory_reports(report_directory)
+            st.session_state.files_loaded = True
+            config = _persist_report_directory(config, report_directory)
+        if not st.session_state.files_loaded:
+            st.info(tr(translations, language, "refresh_to_load_files"))
+            _render_translation_editor(translations, language)
+            return
+        available_reports = list(st.session_state.directory_reports)
+        if not available_reports:
+            st.warning(f"{tr(translations, language, 'no_files_found')} {report_directory}")
+            _render_translation_editor(translations, language)
+            return
 
-    file_labels = _build_file_label_map(files)
+    file_labels = _build_label_map(available_reports)
     selected_labels = st.sidebar.multiselect(
         tr(translations, language, "selected_files"),
         options=list(file_labels.keys()),
@@ -364,7 +398,7 @@ def run_app() -> None:
         _render_translation_editor(translations, language)
         return
 
-    reports = {label: cached_report(file_labels[label]) for label in selected_labels}
+    reports = {label: file_labels[label] for label in selected_labels}
     translations = _ensure_report_header_translations(translations, reports)
 
     all_numeric_fields = sorted({field for report in reports.values() for field in numeric_fields(report)})
@@ -498,4 +532,3 @@ def run_app() -> None:
     updated_translations = _render_translation_editor(translations, language)
     if updated_translations is not translations:
         st.rerun()
-

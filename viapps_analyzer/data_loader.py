@@ -18,7 +18,7 @@ COORDINATE_HINTS = {
 DISTANCE_HINTS = ["distance", "avstand", "chainage", "station", "stasjon", "km", "meter", "m"]
 DATE_HINTS = ["date", "dato", "tid", "time", "timestamp"]
 FILENAME_PATTERN = re.compile(
-    r"^PPS_[A-Za-z]+\d+_(?P<road>\d+)_(?P<section>\d+)_.*?felt(?P<direction>\d+)_+(?P<timestamp>\d{8}-\d{6})$",
+    r"^PPS_[A-Za-z]+\d+_(?P<road>\d+)_(?P<section>\d+)_.+?felt(?P<direction>\d+)_+(?P<timestamp>\d{8}-\d{6})$",
     re.IGNORECASE,
 )
 REPORT_METADATA_FIELDS = {
@@ -249,9 +249,9 @@ def _detect_distance_column(df: pd.DataFrame) -> str | None:
     return None
 
 
-def parse_report(path: str | Path) -> ViaPPSReport:
-    file_path = Path(path)
-    lines = file_path.read_text(encoding="utf-8-sig", errors="ignore").splitlines(keepends=True)
+def parse_report_text(name: str | Path, content: str) -> ViaPPSReport:
+    file_path = Path(name)
+    lines = content.splitlines(keepends=True)
     start, end = _find_main_table(lines)
     table = _build_dataframe(lines, start, end)
     metadata_before = _extract_metadata(lines[:start])
@@ -273,6 +273,15 @@ def parse_report(path: str | Path) -> ViaPPSReport:
         file_metadata=extract_report_file_metadata(file_path, combined_metadata),
         display_name=shorten_report_filename(file_path),
     )
+
+
+def parse_report_bytes(name: str | Path, data: bytes) -> ViaPPSReport:
+    return parse_report_text(name, data.decode("utf-8-sig", errors="ignore"))
+
+
+def parse_report(path: str | Path) -> ViaPPSReport:
+    file_path = Path(path)
+    return parse_report_text(file_path, file_path.read_text(encoding="utf-8-sig", errors="ignore"))
 
 
 def numeric_fields(report: ViaPPSReport) -> list[str]:
@@ -307,4 +316,3 @@ def filter_report(report: ViaPPSReport, date_range: tuple[pd.Timestamp, pd.Times
         file_metadata=report.file_metadata,
         display_name=report.display_name,
     )
-

@@ -473,12 +473,12 @@
     "Spordybde [mm]": {
       "no": "Spordybde [mm]",
       "en": "Spordybde [mm]",
-      "et": "Spordybde [mm]"
+      "et": "Roopa sügavus [mm]"
     },
     "Sporposisjon [cm]": {
       "no": "Sporposisjon [cm]",
       "en": "Sporposisjon [cm]",
-      "et": "Sporposisjon [cm]"
+      "et": "Roopa asukoht [cm]"
     },
     "Start position: County": {
       "no": "Start position: County",
@@ -498,17 +498,17 @@
     "Startposisjon: Fylke": {
       "no": "Startposisjon: Fylke",
       "en": "Startposisjon: Fylke",
-      "et": "Startposisjon: Fylke"
+      "et": "Algus: Piirkond"
     },
     "Startposisjon: Strekning": {
       "no": "Startposisjon: Strekning",
       "en": "Startposisjon: Strekning",
-      "et": "Startposisjon: Strekning"
+      "et": "Algus: TO"
     },
     "Startposisjon: Veg": {
       "no": "Startposisjon: Veg",
       "en": "Startposisjon: Veg",
-      "et": "Startposisjon: Veg"
+      "et": "Algus: Tee nr"
     },
     "Stasjon": {
       "no": "Stasjon",
@@ -522,18 +522,18 @@
     },
     "Tid [ms]": {
       "no": "Tid [ms]",
-      "en": "Tid [ms]",
-      "et": "Tid [ms]"
+      "en": "Time [ms]",
+      "et": "Aeg [ms]"
     },
     "Til strekning []": {
       "no": "Til strekning []",
-      "en": "Til strekning []",
-      "et": "Til strekning []"
+      "en": "To roadsection []",
+      "et": "Kuni TO []"
     },
     "Til vegmeter [m]": {
       "no": "Til vegmeter [m]",
-      "en": "Til vegmeter [m]",
-      "et": "Til vegmeter [m]"
+      "en": "To meter [m]",
+      "et": "Kuni meeter [m]"
     },
     "Tverrfall [%]": {
       "no": "Tverrfall [%]",
@@ -652,6 +652,11 @@
       "en": "Count",
       "et": "Arv"
     },
+    "data_source": {
+      "no": "Datakilde",
+      "en": "Data source",
+      "et": "Andmeallikas"
+    },
     "date_filter": {
       "no": "Datofilter",
       "en": "Date filter",
@@ -730,7 +735,7 @@
     "general_group": {
       "no": "Generelt",
       "en": "General",
-      "et": "?ldine"
+      "et": "Üldine"
     },
     "invalid_coordinate_bounds": {
       "no": "Ugyldig koordinatgrenseformat.",
@@ -746,6 +751,11 @@
       "no": "Lineær referanse",
       "en": "Linear reference",
       "et": "Lineaarne viide"
+    },
+    "local_directory": {
+      "no": "Lokal mappe",
+      "en": "Local directory",
+      "et": "Kohalik kaust"
     },
     "main_table_preview": {
       "no": "Forhåndsvisning av hovedtabell",
@@ -931,6 +941,21 @@
       "no": "Oversettelsesredigering",
       "en": "Translation editor",
       "et": "Tõlkeredaktor"
+    },
+    "upload_files": {
+      "no": "Opplastede filer",
+      "en": "Uploaded files",
+      "et": "Üles laaditud failid"
+    },
+    "upload_files_prompt": {
+      "no": "Last opp minst ?n TSV/TXT-rapportfil for analyse.",
+      "en": "Upload at least one TSV/TXT report file to start analysis.",
+      "et": "Analüüsi alustamiseks laadi üles vähemalt üks TSV/TXT raportifail."
+    },
+    "upload_reports": {
+      "no": "Last opp rapportfiler",
+      "en": "Upload report files",
+      "et": "Laadi raportifailid üles"
     },
     "value": {
       "no": "Verdi",
