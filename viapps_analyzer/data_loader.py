@@ -54,11 +54,12 @@ class ViaPPSReport:
         return merged
 
 
-def list_tsv_files(directory: str | Path) -> list[Path]:
+def list_tsv_files(directory: str | Path, recursive: bool = False) -> list[Path]:
     path = Path(directory)
     if not path.exists():
         return []
-    return sorted([p for p in path.iterdir() if p.suffix.lower() in {".tsv", ".txt"} and p.is_file()])
+    iterator = path.rglob("*") if recursive else path.iterdir()
+    return sorted([p for p in iterator if p.suffix.lower() in {".tsv", ".txt"} and p.is_file()])
 
 
 def shorten_report_filename(path: str | Path) -> str:

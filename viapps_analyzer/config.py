@@ -7,8 +7,32 @@ from typing import Any
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DEFAULT_REPORT_DIR = Path(r"D:\ViaPPS_RBS\REPORT_DATA")
+SAMPLE_DATA_DIR_CANDIDATES = ("Sample_Data", "Sample Data")
+LEGACY_DEFAULT_REPORT_DIR = Path(r"D:\ViaPPS_RBS\REPORT_DATA")
 CONFIG_PATH = BASE_DIR / "config.json"
+
+
+def _sample_data_directory() -> Path | None:
+    for candidate in SAMPLE_DATA_DIR_CANDIDATES:
+        path = BASE_DIR / candidate
+        if path.exists() and path.is_dir():
+            return path
+    return None
+
+
+def _default_report_directory() -> str:
+    sample_directory = _sample_data_directory()
+    if sample_directory is not None:
+        return str(sample_directory)
+    return str(LEGACY_DEFAULT_REPORT_DIR)
+
+
+def _resolve_report_directory(value: str | Path | None) -> str:
+    if value:
+        candidate = Path(str(value))
+        if candidate.exists() and candidate.is_dir():
+            return str(candidate)
+    return _default_report_directory()
 
 
 @dataclass
@@ -25,7 +49,7 @@ class AppConfig:
 
 
 DEFAULT_CONFIG = AppConfig(
-    report_directory=str(DEFAULT_REPORT_DIR),
+    report_directory=_default_report_directory(),
     default_language="en",
     default_interval_m=20,
     available_intervals_m=[1, 5, 20, 100],
@@ -44,6 +68,7 @@ def load_config(path: Path = CONFIG_PATH) -> AppConfig:
 
     raw = json.loads(path.read_text(encoding="utf-8-sig"))
     data: dict[str, Any] = {**DEFAULT_CONFIG.__dict__, **raw}
+    data["report_directory"] = _resolve_report_directory(data.get("report_directory"))
     data["default_selected_fields"] = list(data.get("default_selected_fields", []))
     return AppConfig(**data)
 
