@@ -38,6 +38,7 @@ def _resolve_report_directory(value: str | Path | None) -> str:
 @dataclass
 class AppConfig:
     report_directory: str
+    exporter_directory: str
     default_language: str
     default_interval_m: int
     available_intervals_m: list[int]
@@ -50,6 +51,7 @@ class AppConfig:
 
 DEFAULT_CONFIG = AppConfig(
     report_directory=_default_report_directory(),
+    exporter_directory=str(BASE_DIR),
     default_language="en",
     default_interval_m=20,
     available_intervals_m=[1, 5, 20, 100],
@@ -69,6 +71,7 @@ def load_config(path: Path = CONFIG_PATH) -> AppConfig:
     raw = json.loads(path.read_text(encoding="utf-8-sig"))
     data: dict[str, Any] = {**DEFAULT_CONFIG.__dict__, **raw}
     data["report_directory"] = _resolve_report_directory(data.get("report_directory"))
+    data["exporter_directory"] = str(data.get("exporter_directory") or DEFAULT_CONFIG.exporter_directory)
     data["default_selected_fields"] = list(data.get("default_selected_fields", []))
     return AppConfig(**data)
 

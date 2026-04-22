@@ -627,6 +627,11 @@
       "en": "Comparison mode",
       "et": "Võrdlusrežiim"
     },
+    "comparison_mode_title": {
+      "no": "Sammenligning",
+      "en": "Comparison",
+      "et": "Võrdlus"
+    },
     "configuration_saved": {
       "no": "Konfigurasjon lagret.",
       "en": "Configuration saved.",
@@ -682,6 +687,16 @@
       "en": "Download chart image",
       "et": "Laadi diagramm alla"
     },
+    "download_exporter_bundle": {
+      "no": "Last ned ViaPPS Exporter",
+      "en": "Download ViaPPS Exporter",
+      "et": "Laadi ViaPPS Exporter alla"
+    },
+    "download_exporter_config": {
+      "no": "Last ned eksportkonfigurasjon",
+      "en": "Download exporter config",
+      "et": "Laadi eksporti konfiguratsioon alla"
+    },
     "download_track_export": {
       "no": "Last ned sporeksport",
       "en": "Download track export",
@@ -691,6 +706,26 @@
       "no": "Eksport",
       "en": "Exports",
       "et": "Eksport"
+    },
+    "export_formats": {
+      "no": "Eksportformater",
+      "en": "Export formats",
+      "et": "Ekspordivormingud"
+    },
+    "exporter_config": {
+      "no": "Eksportkonfigurasjon",
+      "en": "Exporter config",
+      "et": "Eksporteri konfiguratsioon"
+    },
+    "exporter_directory": {
+      "no": "Eksportmappe",
+      "en": "Exporter directory",
+      "et": "Eksporteri kaust"
+    },
+    "extra_fields": {
+      "no": "Ekstra felter (kommaseparert)",
+      "en": "Extra fields (comma-separated)",
+      "et": "Lisaväljad (komadega eraldatud)"
     },
     "field": {
       "no": "Felt",
@@ -706,6 +741,11 @@
       "no": "Felter",
       "en": "Fields",
       "et": "Väljad"
+    },
+    "files_found_count": {
+      "no": "Antall funnet filer",
+      "en": "Files found",
+      "et": "Leitud failid"
     },
     "file": {
       "no": "Fil",
@@ -736,6 +776,21 @@
       "no": "Generelt",
       "en": "General",
       "et": "Üldine"
+    },
+    "browser_download_note": {
+      "no": "Nettleseren velger selv lagringsmappe ved nedlasting. Lagre konfigurasjonen i samme mappe som ViaPPS Exporter for automatisk gjenkjenning.",
+      "en": "The browser chooses the download folder itself. Save the config in the same folder as ViaPPS Exporter so it can be found automatically.",
+      "et": "Brauser valib allalaadimise kausta ise. Salvesta konfiguratsioon samasse kausta kui ViaPPS Exporter, et see leitaks automaatselt."
+    },
+    "input_directory": {
+      "no": "Inndatamappe",
+      "en": "Input directory",
+      "et": "Sisendkaust"
+    },
+    "include_subfolders": {
+      "no": "Inkluder undermapper",
+      "en": "Include subfolders",
+      "et": "Kaasa alamkaustad"
     },
     "invalid_coordinate_bounds": {
       "no": "Ugyldig koordinatgrenseformat.",
@@ -807,10 +862,30 @@
       "en": "No TSV/TXT sample files found in",
       "et": "TSV/TXT näidisfaile ei leitud kaustast"
     },
+    "overview_dataset": {
+      "no": "Oversiktsdatasett",
+      "en": "Overview dataset",
+      "et": "Ülevaate andmestik"
+    },
+    "overview_dataset_empty": {
+      "no": "Oversiktsdatasettet er tomt.",
+      "en": "The overview dataset is empty.",
+      "et": "Ülevaate andmestik on tühi."
+    },
+    "overview_mode_title": {
+      "no": "Oversikt",
+      "en": "Overview",
+      "et": "Ülevaade"
+    },
     "overlap_count": {
       "no": "Overlappende punkter",
       "en": "Overlap count",
       "et": "Kattuvate punktide arv"
+    },
+    "output_directory": {
+      "no": "Utdatamappe",
+      "en": "Output directory",
+      "et": "Väljundkaust"
     },
     "overlay": {
       "no": "Overlegg",
@@ -982,10 +1057,30 @@
       "en": "Upload a ZIP archive that contains TSV/TXT report files.",
       "et": "Laadi üles ZIP-arhiiv, mis sisaldab TSV/TXT raportifaile."
     },
+    "upload_overview_dataset": {
+      "no": "Last opp oversiktsdatasett",
+      "en": "Upload overview dataset",
+      "et": "Laadi ülevaate andmestik üles"
+    },
+    "upload_overview_geojson": {
+      "no": "Last opp GeoJSON-spor (valgfritt)",
+      "en": "Upload GeoJSON tracks (optional)",
+      "et": "Laadi GeoJSON rajad üles (valikuline)"
+    },
+    "upload_overview_prompt": {
+      "no": "Last opp et oversiktsdatasett fra ViaPPS Exporter for tabell- og kartvisning.",
+      "en": "Upload a dataset from ViaPPS Exporter to view the overview table and map.",
+      "et": "Laadi üles ViaPPS Exporteri loodud andmestik, et näha ülevaatetabelit ja kaarti."
+    },
     "value": {
       "no": "Verdi",
       "en": "Value",
       "et": "Väärtus"
+    },
+    "workflow_mode": {
+      "no": "Arbeidsflyt",
+      "en": "Workflow mode",
+      "et": "Töörežiim"
     },
     "invalid_zip_file": {
       "no": "Den opplastede filen er ikke et gyldig ZIP-arkiv.",

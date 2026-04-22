@@ -1,9 +1,11 @@
 ﻿from __future__ import annotations
 
 import io
+import json
 from pathlib import Path
 import zipfile
 
+import folium
 import pandas as pd
 import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
@@ -42,6 +44,7 @@ from viapps_analyzer.translations import (
     translate_field_name,
     translations_to_dataframe,
 )
+from viapps_analyzer.exporter_core import ExporterConfig, config_to_json_bytes, default_bundle_name, timestamped_config_name
 
 
 st.set_page_config(page_title="ViaPPS Analyzer +", layout="wide")
@@ -147,6 +150,7 @@ def _build_label_map(reports: list[ViaPPSReport]) -> dict[str, ViaPPSReport]:
 def _persist_report_directory(config: AppConfig, report_directory: str) -> AppConfig:
     updated = AppConfig(
         report_directory=report_directory,
+        exporter_directory=config.exporter_directory,
         default_language=config.default_language,
         default_interval_m=config.default_interval_m,
         available_intervals_m=config.available_intervals_m,
@@ -173,6 +177,7 @@ def _render_settings(config: AppConfig, selected_fields: list[str], translations
         max_map_points = st.number_input("Max map points", min_value=1000, max_value=100000, value=config.max_map_points, step=1000)
         updated = AppConfig(
             report_directory=config.report_directory,
+            exporter_directory=config.exporter_directory,
             default_language=config.default_language,
             default_interval_m=int(default_interval),
             available_intervals_m=config.available_intervals_m,
@@ -367,6 +372,200 @@ def _load_sample_reports() -> tuple[list[ViaPPSReport], Path | None]:
     return _load_directory_reports(str(sample_directory)), sample_directory
 
 
+def _persist_exporter_directory(config: AppConfig, exporter_directory: str) -> AppConfig:
+    updated = AppConfig(
+        report_directory=config.report_directory,
+        exporter_directory=exporter_directory,
+        default_language=config.default_language,
+        default_interval_m=config.default_interval_m,
+        available_intervals_m=config.available_intervals_m,
+        map_tiles=config.map_tiles,
+        chart_template=config.chart_template,
+        default_crs=config.default_crs,
+        max_map_points=config.max_map_points,
+        default_selected_fields=config.default_selected_fields,
+    )
+    save_config(updated)
+    return updated
+
+
+def _available_export_fields(translations: dict) -> list[str]:
+    excluded = set(REPORT_METADATA_FIELDS)
+    fields = {field for field in translations.get("fields", {}) if field not in excluded}
+    for suffix in FIELD_TRANSLATION_TEMPLATES:
+        fields.add(suffix)
+        for group in METHOD_GROUPS:
+            fields.add(f"{group} {suffix}")
+    return sorted(fields)
+
+
+def _build_exporter_bundle() -> bytes:
+    root = Path(__file__).resolve().parent.parent
+    buffer = io.BytesIO()
+    include_files = [root / "exporter_app.py", root / "requirements.txt"]
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        for file_path in include_files:
+            if file_path.exists():
+                archive.write(file_path, arcname=file_path.name)
+        package_dir = root / "viapps_analyzer"
+        for file_path in package_dir.glob("*.py"):
+            archive.write(file_path, arcname=f"viapps_analyzer/{file_path.name}")
+    return buffer.getvalue()
+
+
+def _render_overview_map(df: pd.DataFrame, geojson_file: UploadedFile | None, config: AppConfig, translations: dict, language: str) -> None:
+    fmap = folium.Map(location=[63.4, 10.4], zoom_start=6, tiles=config.map_tiles)
+    bounds: list[list[float]] = []
+    if geojson_file is not None:
+        payload = json.loads(geojson_file.getvalue().decode("utf-8"))
+        layer = folium.GeoJson(payload, tooltip=folium.GeoJsonTooltip(fields=["display_name", "file_name"], aliases=["Display name", "File name"]))
+        layer.add_to(fmap)
+        for feature in payload.get("features", []):
+            coordinates = feature.get("geometry", {}).get("coordinates", [])
+            for lon, lat in coordinates:
+                bounds.append([lat, lon])
+    elif {"start_latitude", "start_longitude", "end_latitude", "end_longitude"}.issubset(df.columns):
+        for _, row in df.dropna(subset=["start_latitude", "start_longitude"]).iterrows():
+            start = [float(row["start_latitude"]), float(row["start_longitude"])]
+            end = start
+            if pd.notna(row.get("end_latitude")) and pd.notna(row.get("end_longitude")):
+                end = [float(row["end_latitude"]), float(row["end_longitude"])]
+            if start != end:
+                folium.PolyLine([start, end], weight=4, tooltip=str(row.get("display_name") or row.get("file_name") or "")).add_to(fmap)
+                bounds.extend([start, end])
+            else:
+                folium.CircleMarker(start, radius=4, tooltip=str(row.get("display_name") or row.get("file_name") or ""), fill=True).add_to(fmap)
+                bounds.append(start)
+    if bounds:
+        fmap.fit_bounds(bounds)
+    st_folium(fmap, use_container_width=True, height=520)
+
+
+def _render_exporter_config_section(config: AppConfig, translations: dict, language: str) -> AppConfig:
+    st.subheader(tr(translations, language, "exporter_config"))
+    available_fields = _available_export_fields(translations)
+    grouped_fields = _group_fields(available_fields)
+    selectable_groups = [group for group, items in grouped_fields.items() if items]
+    default_groups = sorted({_field_group_for(field) for field in config.default_selected_fields if field in available_fields})
+    exporter_directory = st.text_input(
+        tr(translations, language, "exporter_directory"),
+        value=config.exporter_directory,
+        key="exporter_directory_input",
+    )
+    input_directory = st.text_input(tr(translations, language, "input_directory"), value=config.report_directory, key="exporter_input_directory")
+    output_directory = st.text_input(tr(translations, language, "output_directory"), value=config.report_directory, key="exporter_output_directory")
+    recursive_scan = st.checkbox(tr(translations, language, "include_subfolders"), value=False, key="exporter_recursive")
+    selected_groups = st.multiselect(
+        tr(translations, language, "field_groups"),
+        options=selectable_groups,
+        default=default_groups or selectable_groups[:1],
+        format_func=lambda group: _group_label(translations, language, group),
+        key="exporter_field_groups",
+    )
+    visible_fields = [field for group in selected_groups for field in grouped_fields.get(group, [])]
+    field_map = _localized_fields(translations, language, visible_fields)
+    label_lookup = {_field_selector_label(field, field_map): field for field in visible_fields}
+    default_field_keys = [field for field in config.default_selected_fields if field in visible_fields]
+    default_field_labels = [_field_selector_label(field, field_map) for field in default_field_keys]
+    selected_field_labels = st.multiselect(
+        tr(translations, language, "fields"),
+        options=list(label_lookup.keys()),
+        default=default_field_labels or list(label_lookup.keys())[: min(6, len(label_lookup))],
+        key="exporter_fields",
+    )
+    extra_fields_raw = st.text_input(tr(translations, language, "extra_fields"), value="", key="exporter_extra_fields")
+    export_formats = st.multiselect(
+        tr(translations, language, "export_formats"),
+        options=["parquet", "csv", "geojson"],
+        default=["parquet"],
+        key="export_formats",
+    )
+    selected_fields = [label_lookup[label] for label in selected_field_labels]
+    selected_fields.extend([item.strip() for item in extra_fields_raw.split(",") if item.strip()])
+    selected_fields = list(dict.fromkeys(selected_fields))
+
+    if exporter_directory != config.exporter_directory:
+        config = _persist_exporter_directory(config, exporter_directory)
+
+    export_config = ExporterConfig(
+        input_directory=input_directory,
+        output_directory=output_directory,
+        config_directory=exporter_directory,
+        selected_fields=selected_fields,
+        selected_field_groups=selected_groups,
+        export_formats=export_formats or ["parquet"],
+        default_crs=config.default_crs,
+        recursive=recursive_scan,
+    )
+    config_bytes = config_to_json_bytes(export_config)
+    st.caption(tr(translations, language, "browser_download_note"))
+    st.download_button(
+        tr(translations, language, "download_exporter_config"),
+        data=config_bytes,
+        file_name=timestamped_config_name(),
+        mime="application/json",
+    )
+    st.download_button(
+        tr(translations, language, "download_exporter_bundle"),
+        data=_build_exporter_bundle(),
+        file_name=default_bundle_name(),
+        mime="application/zip",
+    )
+    return config
+
+
+def _render_overview_mode(config: AppConfig, translations: dict, language: str) -> None:
+    config = _render_exporter_config_section(config, translations, language)
+    st.subheader(tr(translations, language, "overview_dataset"))
+    overview_file = st.file_uploader(
+        tr(translations, language, "upload_overview_dataset"),
+        type=["parquet", "csv"],
+        accept_multiple_files=False,
+        key="overview_dataset_uploader",
+    )
+    geojson_file = st.file_uploader(
+        tr(translations, language, "upload_overview_geojson"),
+        type=["geojson", "json"],
+        accept_multiple_files=False,
+        key="overview_geojson_uploader",
+    )
+    if overview_file is None:
+        st.info(tr(translations, language, "upload_overview_prompt"))
+        return
+
+    if overview_file.name.lower().endswith(".parquet"):
+        df = pd.read_parquet(io.BytesIO(overview_file.getvalue()))
+    else:
+        df = pd.read_csv(io.BytesIO(overview_file.getvalue()))
+    if df.empty:
+        st.warning(tr(translations, language, "overview_dataset_empty"))
+        return
+
+    st.caption(f"{tr(translations, language, 'files_found_count')}: {len(df)}")
+    display_df = df.copy()
+    localized_columns = {}
+    for column in display_df.columns:
+        if column in translations.get("ui", {}):
+            localized_columns[column] = tr(translations, language, column)
+        elif "__" in column:
+            field_name, suffix = column.rsplit("__", 1)
+            localized_columns[column] = f"{translate_field_name(translations, language, field_name)} ({suffix})"
+        else:
+            localized_columns[column] = translate_field_name(translations, language, column)
+    display_df = display_df.rename(columns=localized_columns)
+    st.dataframe(display_df, use_container_width=True, hide_index=True)
+
+    st.subheader(tr(translations, language, "map"))
+    _render_overview_map(df, geojson_file, config, translations, language)
+
+    st.download_button(
+        tr(translations, language, "comparison_csv"),
+        export_dataframe_csv(df),
+        "overview_dataset.csv",
+        "text/csv",
+    )
+
+
 def run_app() -> None:
     config = load_config()
     translations = load_translations()
@@ -393,6 +592,17 @@ def run_app() -> None:
         index=SUPPORTED_LANGUAGES.index(config.default_language) if config.default_language in SUPPORTED_LANGUAGES else 1,
     )
     st.title(tr(translations, language, "app_title"))
+    workflow_mode = st.sidebar.radio(
+        tr(translations, language, "workflow_mode"),
+        options=["comparison", "overview"],
+        format_func=lambda option: tr(translations, language, "comparison_mode_title") if option == "comparison" else tr(translations, language, "overview_mode_title"),
+    )
+    if workflow_mode == "overview":
+        _render_overview_mode(config, translations, language)
+        updated_translations = _render_translation_editor(translations, language)
+        if updated_translations is not translations:
+            st.rerun()
+        return
 
     data_source = st.sidebar.radio(
         tr(translations, language, "data_source"),
