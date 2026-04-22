@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import queue
+import sys
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -32,6 +33,14 @@ class ExporterApp:
         self._build_ui()
         self._load_latest_config()
         self._poll_queue()
+
+    def _config_search_directories(self) -> list[Path]:
+        launcher_directory = Path(sys.argv[0]).resolve().parent
+        downloads_directory = Path.home() / "Downloads"
+        directories = [launcher_directory]
+        if downloads_directory != launcher_directory:
+            directories.append(downloads_directory)
+        return directories
 
     def _build_ui(self) -> None:
         frame = ttk.Frame(self.root, padding=16)
@@ -70,12 +79,12 @@ class ExporterApp:
         ttk.Label(frame, textvariable=self.summary_var, wraplength=700, justify="left").grid(row=8, column=1, columnspan=3, sticky="w")
 
     def _load_latest_config(self) -> None:
-        latest = find_latest_config(Path(__file__).resolve().parent)
+        latest = find_latest_config(self._config_search_directories())
         if latest is not None:
             self.config_path_var.set(str(latest))
             self._load_selected_config()
         else:
-            self.scan_summary_var.set("No config file found next to ViaPPS Exporter.")
+            self.scan_summary_var.set("No config file found in the ViaPPS Exporter folder or Downloads.")
 
     def _load_selected_config(self) -> None:
         path_text = self.config_path_var.get().strip()
@@ -98,7 +107,11 @@ class ExporterApp:
         self._refresh_scan_summary()
 
     def _browse_config(self) -> None:
-        path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json"), ("All files", "*.*")], title="Choose exporter config")
+        path = filedialog.askopenfilename(
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+            title="Choose exporter config",
+            initialdir=str(self._config_search_directories()[0]),
+        )
         if path:
             self.config_path_var.set(path)
             self._load_selected_config()

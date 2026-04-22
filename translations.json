@@ -777,6 +777,11 @@
       "en": "General",
       "et": "Üldine"
     },
+    "geojson_too_large_note": {
+      "no": "Stor GeoJSON kan være tung å vise i nettappen. Bruk helst det nye parquet-datasettet alene eller generer en mindre GeoJSON.",
+      "en": "A large GeoJSON can be too heavy for the web app. Prefer the new parquet dataset alone or generate a smaller GeoJSON.",
+      "et": "Suur GeoJSON võib veebirakenduse jaoks olla liiga raske. Eelista uut parquet-andmestikku eraldi või loo väiksem GeoJSON."
+    },
     "browser_download_note": {
       "no": "Nettleseren velger selv lagringsmappe ved nedlasting. Lagre konfigurasjonen i samme mappe som ViaPPS Exporter for automatisk gjenkjenning.",
       "en": "The browser chooses the download folder itself. Save the config in the same folder as ViaPPS Exporter so it can be found automatically.",

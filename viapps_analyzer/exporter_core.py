@@ -4,7 +4,7 @@ import json
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Iterable
 
 import geopandas as gpd
 import pandas as pd
@@ -72,11 +72,15 @@ def load_exporter_config(path: str | Path) -> ExporterConfig:
     return ExporterConfig(**data)
 
 
-def find_latest_config(directory: str | Path) -> Path | None:
-    path = Path(directory)
-    if not path.exists():
-        return None
-    matches = sorted(path.glob(CONFIG_GLOB), key=lambda item: item.stat().st_mtime, reverse=True)
+def find_latest_config(directory: str | Path | Iterable[str | Path]) -> Path | None:
+    directories = directory if isinstance(directory, Iterable) and not isinstance(directory, (str, Path)) else [directory]
+    matches: list[Path] = []
+    for item in directories:
+        path = Path(item)
+        if not path.exists():
+            continue
+        matches.extend(path.glob(CONFIG_GLOB))
+    matches = sorted(matches, key=lambda item: item.stat().st_mtime, reverse=True)
     return matches[0] if matches else None
 
 
@@ -136,6 +140,7 @@ def _report_to_row(report: ViaPPSReport, selected_fields: list[str], default_crs
 
     lat_lon = _report_lat_lon_bounds(report, default_crs)
     row.update(lat_lon)
+    row["track_coordinates_json"] = _report_track_coordinates_json(report, default_crs)
 
     for field in selected_fields:
         if field not in report.table.columns:
@@ -200,9 +205,35 @@ def _report_to_geometry_row(report: ViaPPSReport, default_crs: str) -> dict[str,
     if gdf.crs and gdf.crs.to_string() != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
     points = [(geom.x, geom.y) for geom in gdf.geometry if geom is not None]
+    points = _downsample_points(points, max_points=160)
     if len(points) < 2:
         return None
     return {"display_name": report.display_name or report.path.stem, "file_name": report.path.name, "geometry": LineString(points)}
+
+
+def _report_track_coordinates_json(report: ViaPPSReport, default_crs: str) -> str:
+    gdf = build_geodataframe(report, default_crs=default_crs)
+    if gdf.empty:
+        return ""
+    if gdf.crs and gdf.crs.to_string() != "EPSG:4326":
+        gdf = gdf.to_crs("EPSG:4326")
+    points = [(geom.y, geom.x) for geom in gdf.geometry if geom is not None]
+    points = _downsample_points(points, max_points=160)
+    if len(points) < 2:
+        return ""
+    return json.dumps(points, ensure_ascii=False, separators=(",", ":"))
+
+
+def _downsample_points(points: list[tuple[float, float]], max_points: int = 120) -> list[tuple[float, float]]:
+    if len(points) <= max_points:
+        return points
+    step = (len(points) - 1) / max(1, max_points - 1)
+    sampled = [points[min(len(points) - 1, int(round(index * step)))] for index in range(max_points)]
+    deduped: list[tuple[float, float]] = []
+    for point in sampled:
+        if not deduped or point != deduped[-1]:
+            deduped.append(point)
+    return deduped if len(deduped) >= 2 else points[:2]
 
 
 def _write_output_files(dataset: pd.DataFrame, geometries: list[dict[str, object]], config: ExporterConfig) -> dict[str, str]:

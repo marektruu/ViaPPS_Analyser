@@ -424,6 +424,20 @@ def _render_overview_map(df: pd.DataFrame, geojson_file: UploadedFile | None, co
             coordinates = feature.get("geometry", {}).get("coordinates", [])
             for lon, lat in coordinates:
                 bounds.append([lat, lon])
+    elif "track_coordinates_json" in df.columns:
+        for _, row in df.dropna(subset=["track_coordinates_json"]).iterrows():
+            raw_value = str(row.get("track_coordinates_json") or "").strip()
+            if not raw_value:
+                continue
+            try:
+                coordinates = json.loads(raw_value)
+            except json.JSONDecodeError:
+                continue
+            if len(coordinates) < 2:
+                continue
+            path = [[float(lat), float(lon)] for lat, lon in coordinates]
+            folium.PolyLine(path, weight=3, tooltip=str(row.get("display_name") or row.get("file_name") or "")).add_to(fmap)
+            bounds.extend(path)
     elif {"start_latitude", "start_longitude", "end_latitude", "end_longitude"}.issubset(df.columns):
         for _, row in df.dropna(subset=["start_latitude", "start_longitude"]).iterrows():
             start = [float(row["start_latitude"]), float(row["start_longitude"])]
@@ -529,6 +543,8 @@ def _render_overview_mode(config: AppConfig, translations: dict, language: str) 
         accept_multiple_files=False,
         key="overview_geojson_uploader",
     )
+    if geojson_file is not None and getattr(geojson_file, "size", 0) > 25 * 1024 * 1024:
+        st.warning(tr(translations, language, "geojson_too_large_note"))
     if overview_file is None:
         st.info(tr(translations, language, "upload_overview_prompt"))
         return
