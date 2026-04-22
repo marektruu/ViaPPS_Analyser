@@ -46,6 +46,7 @@ st.set_page_config(page_title="ViaPPS Analyzer +", layout="wide")
 
 METHOD_GROUPS = ["CEN 13036", "Bunn", "Krum", "Metode", "Regresjon", "Snor"]
 GENERAL_GROUP_KEY = "general"
+SAMPLE_DATA_DIR_CANDIDATES = ("Sample_Data", "Sample Data")
 FIELD_TRANSLATION_TEMPLATES = {
     "Areal [cm^2]": {"no": "Areal [cm^2]", "en": "Area [cm^2]", "et": "Roopa pindala [cm^2]"},
     "Hyre spordybde [mm]": {"no": "Hyre spordybde [mm]", "en": "Rut depth right [mm]", "et": "Roopa sügavus paremal [mm]"},
@@ -72,6 +73,15 @@ def cached_report(path: str) -> ViaPPSReport:
 @st.cache_data(show_spinner=False)
 def cached_uploaded_report(name: str, data: bytes) -> ViaPPSReport:
     return parse_report_bytes(name, data)
+
+
+def _sample_data_directory() -> Path | None:
+    base_dir = Path(__file__).resolve().parent.parent
+    for candidate in SAMPLE_DATA_DIR_CANDIDATES:
+        path = base_dir / candidate
+        if path.exists() and path.is_dir():
+            return path
+    return None
 
 
 def _localized_fields(translations: dict, language: str, fields: list[str]) -> dict[str, str]:
@@ -327,6 +337,13 @@ def _load_uploaded_reports(uploaded_files: list[UploadedFile]) -> list[ViaPPSRep
     return reports
 
 
+def _load_sample_reports() -> tuple[list[ViaPPSReport], Path | None]:
+    sample_directory = _sample_data_directory()
+    if sample_directory is None:
+        return [], None
+    return _load_directory_reports(str(sample_directory)), sample_directory
+
+
 def run_app() -> None:
     config = load_config()
     translations = load_translations()
@@ -350,11 +367,24 @@ def run_app() -> None:
 
     data_source = st.sidebar.radio(
         tr(translations, language, "data_source"),
-        options=["upload", "directory"],
-        format_func=lambda option: tr(translations, language, "upload_files") if option == "upload" else tr(translations, language, "local_directory"),
+        options=["sample", "upload", "directory"],
+        format_func=lambda option: {
+            "sample": tr(translations, language, "sample_files"),
+            "upload": tr(translations, language, "upload_files"),
+            "directory": tr(translations, language, "local_directory"),
+        }[option],
     )
 
-    if data_source == "upload":
+    if data_source == "sample":
+        available_reports, sample_directory = _load_sample_reports()
+        if sample_directory is not None:
+            st.sidebar.caption(f"{tr(translations, language, 'sample_data_directory')}: {sample_directory}")
+        if not available_reports:
+            missing_sample_path = Path(__file__).resolve().parent.parent / SAMPLE_DATA_DIR_CANDIDATES[0]
+            st.warning(f"{tr(translations, language, 'no_sample_files_found')} {missing_sample_path}")
+            _render_translation_editor(translations, language)
+            return
+    elif data_source == "upload":
         uploaded_files = st.sidebar.file_uploader(
             tr(translations, language, "upload_reports"),
             type=["txt", "tsv"],

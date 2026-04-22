@@ -802,6 +802,11 @@
       "en": "No TSV/TXT files found in",
       "et": "TSV/TXT faile ei leitud kaustast"
     },
+    "no_sample_files_found": {
+      "no": "Ingen TSV/TXT-eksempelfiler funnet i",
+      "en": "No TSV/TXT sample files found in",
+      "et": "TSV/TXT näidisfaile ei leitud kaustast"
+    },
     "overlap_count": {
       "no": "Overlappende punkter",
       "en": "Overlap count",
@@ -866,6 +871,16 @@
       "no": "Lagre innstillinger",
       "en": "Save settings",
       "et": "Salvesta seaded"
+    },
+    "sample_data_directory": {
+      "no": "Mappe med eksempelfiler",
+      "en": "Sample files directory",
+      "et": "Näidisfailide kaust"
+    },
+    "sample_files": {
+      "no": "Eksempelfiler",
+      "en": "Sample files",
+      "et": "Näidisfailid"
     },
     "save_translations": {
       "no": "Lagre oversettelser",
