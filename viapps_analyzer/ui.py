@@ -52,6 +52,7 @@ st.set_page_config(page_title="ViaPPS Analyzer +", layout="wide")
 METHOD_GROUPS = ["CEN 13036", "Bunn", "Krum", "Metode", "Regresjon", "Snor"]
 GENERAL_GROUP_KEY = "general"
 SAMPLE_DATA_DIR_CANDIDATES = ("Sample_Data", "Sample Data")
+DATE_COLOR_PALETTE = ["#00441b", "#005a24", "#006d2c", "#1b7837", "#238b45", "#2e9b4f", "#31a354", "#3aa65c"]
 FIELD_TRANSLATION_TEMPLATES = {
     "Areal [cm^2]": {"no": "Areal [cm^2]", "en": "Area [cm^2]", "et": "Roopa pindala [cm^2]"},
     "Hyre spordybde [mm]": {"no": "Hyre spordybde [mm]", "en": "Rut depth right [mm]", "et": "Roopa sügavus paremal [mm]"},
@@ -413,18 +414,67 @@ def _build_exporter_bundle() -> bytes:
     return buffer.getvalue()
 
 
+def _date_color_lookup(values: list[str]) -> dict[str, str]:
+    unique_values = sorted({value.strip() for value in values if value and value.strip()})
+    if not unique_values:
+        return {}
+    return {value: DATE_COLOR_PALETTE[index % len(DATE_COLOR_PALETTE)] for index, value in enumerate(unique_values)}
+
+
+def _overview_tooltip_fields(*field_groups: list[str]) -> tuple[list[str], list[str]]:
+    fields: list[str] = []
+    for group in field_groups:
+        for field in group:
+            if field and field not in fields:
+                fields.append(field)
+    aliases = [field.replace("_", " ").title() for field in fields]
+    return fields, aliases
+
+
 def _render_overview_map(df: pd.DataFrame, geojson_file: UploadedFile | None, config: AppConfig, translations: dict, language: str) -> None:
+    use_date_colors = False
+    if "recording_date" in df.columns or geojson_file is not None:
+        use_date_colors = st.checkbox(
+            tr(translations, language, "color_tracks_by_recording_date"),
+            value=False,
+            key="overview_map_color_by_recording_date",
+        )
+
     fmap = folium.Map(location=[63.4, 10.4], zoom_start=6, tiles=config.map_tiles)
     bounds: list[list[float]] = []
     if geojson_file is not None:
         payload = json.loads(geojson_file.getvalue().decode("utf-8"))
-        layer = folium.GeoJson(payload, tooltip=folium.GeoJsonTooltip(fields=["display_name", "file_name"], aliases=["Display name", "File name"]))
+        feature_dates = [
+            str(feature.get("properties", {}).get("recording_date") or "").strip()
+            for feature in payload.get("features", [])
+        ]
+        color_lookup = _date_color_lookup(feature_dates) if use_date_colors else {}
+        for feature in payload.get("features", []):
+            properties = feature.setdefault("properties", {})
+            recording_date = str(properties.get("recording_date") or "").strip()
+            properties["_line_color"] = color_lookup.get(recording_date, "#238b45" if use_date_colors else "#3388ff")
+        tooltip_fields, tooltip_aliases = _overview_tooltip_fields(
+            ["display_name", "file_name"],
+            ["recording_date"] if any(feature_dates) else [],
+            ["recording_time"] if any(str(feature.get("properties", {}).get("recording_time") or "").strip() for feature in payload.get("features", [])) else [],
+        )
+        layer = folium.GeoJson(
+            payload,
+            style_function=lambda feature: {
+                "color": feature["properties"].get("_line_color", "#3388ff"),
+                "weight": 4,
+                "opacity": 0.9,
+            },
+            tooltip=folium.GeoJsonTooltip(fields=tooltip_fields, aliases=tooltip_aliases),
+        )
         layer.add_to(fmap)
         for feature in payload.get("features", []):
             coordinates = feature.get("geometry", {}).get("coordinates", [])
             for lon, lat in coordinates:
                 bounds.append([lat, lon])
     elif "track_coordinates_json" in df.columns:
+        row_dates = [str(value).strip() for value in df.get("recording_date", pd.Series(dtype=str)).tolist()] if "recording_date" in df.columns else []
+        color_lookup = _date_color_lookup(row_dates) if use_date_colors else {}
         for _, row in df.dropna(subset=["track_coordinates_json"]).iterrows():
             raw_value = str(row.get("track_coordinates_json") or "").strip()
             if not raw_value:
@@ -436,19 +486,51 @@ def _render_overview_map(df: pd.DataFrame, geojson_file: UploadedFile | None, co
             if len(coordinates) < 2:
                 continue
             path = [[float(lat), float(lon)] for lat, lon in coordinates]
-            folium.PolyLine(path, weight=3, tooltip=str(row.get("display_name") or row.get("file_name") or "")).add_to(fmap)
+            recording_date = str(row.get("recording_date") or "").strip()
+            recording_time = str(row.get("recording_time") or "").strip()
+            tooltip_lines = [str(row.get("display_name") or row.get("file_name") or "")]
+            if recording_date:
+                tooltip_lines.append(f"{tr(translations, language, 'date_label')}: {recording_date}")
+            if recording_time:
+                tooltip_lines.append(f"{tr(translations, language, 'time_label')}: {recording_time}")
+            folium.PolyLine(
+                path,
+                weight=4,
+                color=color_lookup.get(recording_date, "#238b45" if use_date_colors else "#3388ff"),
+                opacity=0.9,
+                tooltip=" | ".join(tooltip_lines),
+            ).add_to(fmap)
             bounds.extend(path)
     elif {"start_latitude", "start_longitude", "end_latitude", "end_longitude"}.issubset(df.columns):
+        row_dates = [str(value).strip() for value in df.get("recording_date", pd.Series(dtype=str)).tolist()] if "recording_date" in df.columns else []
+        color_lookup = _date_color_lookup(row_dates) if use_date_colors else {}
         for _, row in df.dropna(subset=["start_latitude", "start_longitude"]).iterrows():
             start = [float(row["start_latitude"]), float(row["start_longitude"])]
             end = start
             if pd.notna(row.get("end_latitude")) and pd.notna(row.get("end_longitude")):
                 end = [float(row["end_latitude"]), float(row["end_longitude"])]
+            recording_date = str(row.get("recording_date") or "").strip()
+            tooltip_lines = [str(row.get("display_name") or row.get("file_name") or "")]
+            if recording_date:
+                tooltip_lines.append(f"{tr(translations, language, 'date_label')}: {recording_date}")
             if start != end:
-                folium.PolyLine([start, end], weight=4, tooltip=str(row.get("display_name") or row.get("file_name") or "")).add_to(fmap)
+                folium.PolyLine(
+                    [start, end],
+                    weight=4,
+                    color=color_lookup.get(recording_date, "#238b45" if use_date_colors else "#3388ff"),
+                    opacity=0.9,
+                    tooltip=" | ".join(tooltip_lines),
+                ).add_to(fmap)
                 bounds.extend([start, end])
             else:
-                folium.CircleMarker(start, radius=4, tooltip=str(row.get("display_name") or row.get("file_name") or ""), fill=True).add_to(fmap)
+                folium.CircleMarker(
+                    start,
+                    radius=4,
+                    tooltip=" | ".join(tooltip_lines),
+                    color=color_lookup.get(recording_date, "#238b45" if use_date_colors else "#3388ff"),
+                    fill=True,
+                    fill_color=color_lookup.get(recording_date, "#238b45" if use_date_colors else "#3388ff"),
+                ).add_to(fmap)
                 bounds.append(start)
     if bounds:
         fmap.fit_bounds(bounds)

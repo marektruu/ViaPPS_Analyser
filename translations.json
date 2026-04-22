@@ -612,6 +612,11 @@
       "en": "Chart image format",
       "et": "Graafiku pildiformaat"
     },
+    "color_tracks_by_recording_date": {
+      "no": "Fargelegg spor etter opptaksdato",
+      "en": "Color tracks by recording date",
+      "et": "Värvi lõigud salvestuse kuupäeva järgi"
+    },
     "comparison_csv": {
       "no": "Sammenligning CSV",
       "en": "Comparison CSV",
@@ -666,6 +671,11 @@
       "no": "Datofilter",
       "en": "Date filter",
       "et": "Kuupäevafilter"
+    },
+    "date_label": {
+      "no": "Dato",
+      "en": "Date",
+      "et": "Kuupäev"
     },
     "descending": {
       "no": "Synkende",
@@ -1036,6 +1046,11 @@
       "no": "Spor-eksportformat",
       "en": "Track export format",
       "et": "Raja ekspordivorming"
+    },
+    "time_label": {
+      "no": "Tid",
+      "en": "Time",
+      "et": "Kellaaeg"
     },
     "translation_editor": {
       "no": "Oversettelsesredigering",

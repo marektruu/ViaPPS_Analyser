@@ -139,16 +139,29 @@ def _metadata_value(metadata: dict[str, str], *aliases: str) -> str:
     return ""
 
 
+def _parse_metadata_datetime(value: str) -> datetime | None:
+    raw = str(value).strip()
+    if not raw:
+        return None
+    parsed = pd.to_datetime(raw, errors="coerce", dayfirst=True)
+    if pd.isna(parsed):
+        return None
+    return parsed.to_pydatetime()
+
+
 def extract_report_file_metadata(path: str | Path, metadata: dict[str, str]) -> dict[str, str]:
     file_path = Path(path)
     filename_timestamp = _filename_timestamp(file_path)
+    recording_source = _metadata_value(metadata, "Opptaksdato", "Recording date")
+    recording_timestamp = _parse_metadata_datetime(recording_source) or filename_timestamp
     fallback_date = filename_timestamp.strftime("%Y-%m-%d") if filename_timestamp else ""
-    fallback_datetime = filename_timestamp.strftime("%Y-%m-%d %H:%M:%S") if filename_timestamp else ""
+    recording_date = recording_timestamp.strftime("%Y-%m-%d") if recording_timestamp else fallback_date
+    recording_time = recording_timestamp.strftime("%Y-%m-%d %H:%M:%S") if recording_timestamp else ""
     return {
         "file_name": shorten_report_filename(file_path),
         "report_date": _metadata_value(metadata, "Rapportdato", "Report date") or fallback_date,
-        "recording_date": _metadata_value(metadata, "Opptaksdato", "Recording date") or fallback_date,
-        "recording_time": fallback_datetime,
+        "recording_date": recording_date,
+        "recording_time": recording_time,
         "measurement_length_m": _metadata_value(metadata, "Malingslengdem", "Målingslengde", "Measurement length m"),
         "start_county": _metadata_value(metadata, "Startposisjon: Fylke", "Start position: County"),
         "start_road": _metadata_value(metadata, "Startposisjon: Veg", "Start position: Road"),
