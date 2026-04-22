@@ -3,6 +3,7 @@
 import io
 import re
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -25,6 +26,7 @@ REPORT_METADATA_FIELDS = {
     "file_name": ("Filnavn", "File name"),
     "report_date": ("Rapportdato", "Report date"),
     "recording_date": ("Opptaksdato", "Recording date"),
+    "recording_time": ("Opptakstid", "Recording time"),
     "measurement_length_m": ("Malingslengdem", "Measurement length m"),
     "start_county": ("Startposisjon: Fylke", "Start position: County"),
     "start_road": ("Startposisjon: Veg", "Start position: Road"),
@@ -68,6 +70,17 @@ def shorten_report_filename(path: str | Path) -> str:
     if match:
         return "{road}_{section}_{direction}_{timestamp}".format(**match.groupdict())
     return file_path.stem
+
+
+def _filename_timestamp(path: str | Path) -> datetime | None:
+    file_path = Path(path)
+    match = FILENAME_PATTERN.search(file_path.stem)
+    if not match:
+        return None
+    try:
+        return datetime.strptime(match.group("timestamp"), "%Y%m%d-%H%M%S")
+    except ValueError:
+        return None
 
 
 def _split_line(line: str) -> list[str]:
@@ -128,10 +141,14 @@ def _metadata_value(metadata: dict[str, str], *aliases: str) -> str:
 
 def extract_report_file_metadata(path: str | Path, metadata: dict[str, str]) -> dict[str, str]:
     file_path = Path(path)
+    filename_timestamp = _filename_timestamp(file_path)
+    fallback_date = filename_timestamp.strftime("%Y-%m-%d") if filename_timestamp else ""
+    fallback_datetime = filename_timestamp.strftime("%Y-%m-%d %H:%M:%S") if filename_timestamp else ""
     return {
         "file_name": shorten_report_filename(file_path),
-        "report_date": _metadata_value(metadata, "Rapportdato", "Report date"),
-        "recording_date": _metadata_value(metadata, "Opptaksdato", "Recording date"),
+        "report_date": _metadata_value(metadata, "Rapportdato", "Report date") or fallback_date,
+        "recording_date": _metadata_value(metadata, "Opptaksdato", "Recording date") or fallback_date,
+        "recording_time": fallback_datetime,
         "measurement_length_m": _metadata_value(metadata, "Malingslengdem", "Målingslengde", "Measurement length m"),
         "start_county": _metadata_value(metadata, "Startposisjon: Fylke", "Start position: County"),
         "start_road": _metadata_value(metadata, "Startposisjon: Veg", "Start position: Road"),

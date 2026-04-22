@@ -17,6 +17,7 @@ from viapps_analyzer.map_utils import build_geodataframe
 CONFIG_PREFIX = "viapps_export_"
 CONFIG_GLOB = f"{CONFIG_PREFIX}*.json"
 DATASET_BASENAME = "viapps_overview_dataset"
+OVERVIEW_TRACK_MAX_POINTS = 300
 
 
 @dataclass
@@ -105,8 +106,9 @@ def export_overview_dataset(config: ExporterConfig, progress_callback: ProgressC
             progress_callback(index - 1, total_files, f"Parsing {path.name}")
         try:
             report = parse_report(path)
-            rows.append(_report_to_row(report, config.selected_fields, config.default_crs, include_metadata=config.include_metadata))
-            geometry_row = _report_to_geometry_row(report, config.default_crs)
+            row = _report_to_row(report, config.selected_fields, config.default_crs, include_metadata=config.include_metadata)
+            rows.append(row)
+            geometry_row = _report_to_geometry_row(report, row, config.default_crs)
             if geometry_row is not None:
                 geometries.append(geometry_row)
         except Exception as exc:
@@ -198,17 +200,20 @@ def _report_lat_lon_bounds(report: ViaPPSReport, default_crs: str) -> dict[str, 
     }
 
 
-def _report_to_geometry_row(report: ViaPPSReport, default_crs: str) -> dict[str, object] | None:
+def _report_to_geometry_row(report: ViaPPSReport, row: dict[str, object], default_crs: str) -> dict[str, object] | None:
     gdf = build_geodataframe(report, default_crs=default_crs)
     if gdf.empty:
         return None
     if gdf.crs and gdf.crs.to_string() != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
     points = [(geom.x, geom.y) for geom in gdf.geometry if geom is not None]
-    points = _downsample_points(points, max_points=160)
+    points = _downsample_points(points, max_points=OVERVIEW_TRACK_MAX_POINTS)
     if len(points) < 2:
         return None
-    return {"display_name": report.display_name or report.path.stem, "file_name": report.path.name, "geometry": LineString(points)}
+    geometry_row = _geojson_properties_from_row(row)
+    geometry_row.pop("track_coordinates_json", None)
+    geometry_row["geometry"] = LineString(points)
+    return geometry_row
 
 
 def _report_track_coordinates_json(report: ViaPPSReport, default_crs: str) -> str:
@@ -218,22 +223,76 @@ def _report_track_coordinates_json(report: ViaPPSReport, default_crs: str) -> st
     if gdf.crs and gdf.crs.to_string() != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
     points = [(geom.y, geom.x) for geom in gdf.geometry if geom is not None]
-    points = _downsample_points(points, max_points=160)
+    points = _downsample_points(points, max_points=OVERVIEW_TRACK_MAX_POINTS)
     if len(points) < 2:
         return ""
     return json.dumps(points, ensure_ascii=False, separators=(",", ":"))
 
 
 def _downsample_points(points: list[tuple[float, float]], max_points: int = 120) -> list[tuple[float, float]]:
+    deduped = _dedupe_consecutive_points(points)
+    if len(deduped) <= max_points:
+        return deduped
+
+    line = LineString(deduped)
+    if line.is_empty or line.length == 0:
+        return deduped[:max(2, min(len(deduped), max_points))]
+
+    low = 0.0
+    high = line.length
+    best = deduped
+
+    # Use Douglas-Peucker simplification with a binary search tolerance so we
+    # keep the most important bends instead of just every nth source point.
+    for _ in range(24):
+        tolerance = (low + high) / 2
+        simplified = line.simplify(tolerance, preserve_topology=False)
+        candidate = _dedupe_consecutive_points([(float(x), float(y)) for x, y in simplified.coords])
+        if len(candidate) < 2:
+            high = tolerance
+            continue
+        if len(candidate) <= max_points:
+            best = candidate
+            high = tolerance
+        else:
+            low = tolerance
+
+    if len(best) <= max_points:
+        return best
+
+    return _evenly_sample_points(best, max_points=max_points)
+
+
+def _dedupe_consecutive_points(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    deduped: list[tuple[float, float]] = []
+    for point in points:
+        if not deduped or point != deduped[-1]:
+            deduped.append(point)
+    return deduped
+
+
+def _evenly_sample_points(points: list[tuple[float, float]], max_points: int) -> list[tuple[float, float]]:
     if len(points) <= max_points:
         return points
     step = (len(points) - 1) / max(1, max_points - 1)
     sampled = [points[min(len(points) - 1, int(round(index * step)))] for index in range(max_points)]
-    deduped: list[tuple[float, float]] = []
-    for point in sampled:
-        if not deduped or point != deduped[-1]:
-            deduped.append(point)
+    deduped = _dedupe_consecutive_points(sampled)
     return deduped if len(deduped) >= 2 else points[:2]
+
+
+def _geojson_properties_from_row(row: dict[str, object]) -> dict[str, object]:
+    return {key: _json_safe_value(value) for key, value in row.items()}
+
+
+def _json_safe_value(value: object) -> object:
+    if value is pd.NA:
+        return None
+    try:
+        if pd.isna(value):
+            return None
+    except TypeError:
+        pass
+    return value
 
 
 def _write_output_files(dataset: pd.DataFrame, geometries: list[dict[str, object]], config: ExporterConfig) -> dict[str, str]:

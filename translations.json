@@ -922,6 +922,11 @@
       "en": "Recording date",
       "et": "Salvestuse kuupäev"
     },
+    "recording_time": {
+      "no": "Opptakstid",
+      "en": "Recording time",
+      "et": "Salvestuse aeg"
+    },
     "refresh_files": {
       "no": "Oppdater filer",
       "en": "Refresh files",

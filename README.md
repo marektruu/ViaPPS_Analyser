@@ -1,6 +1,9 @@
-﻿# ViaPPS Analyzer
+# ViaPPS Analyzer
 
-ViaPPS Analyzer is a Streamlit application for loading, comparing, summarizing, and mapping ViaPPS Desktop report files stored as tab-separated text files. It is designed for report folders that contain metadata blocks, a main measurement table, and coordinate data used to build track maps and exports.
+ViaPPS Analyzer is a Streamlit application for loading, comparing, summarizing, and mapping ViaPPS Desktop report files stored as tab-separated text files. It supports two complementary workflows:
+
+- `Comparison`: inspect one or more ViaPPS reports directly in the Streamlit UI
+- `Overview`: generate a lightweight dataset bundle from many reports and review it later in the Streamlit UI
 
 ## Features
 
@@ -18,12 +21,16 @@ ViaPPS Analyzer is a Streamlit application for loading, comparing, summarizing, 
 - Export of comparison data to CSV and Excel
 - Export of charts to HTML and, when supported by the environment, PNG/PDF
 - Export of tracks to GeoJSON, GeoPackage, or zipped Shapefile
+- Overview workflow for loading exported parquet/CSV datasets plus optional GeoJSON track lines
+- Built-in ViaPPS Exporter bundle download for bulk dataset generation outside the Streamlit app
+- Parquet and GeoJSON overview track outputs use the same 160-point downsampling logic
 - Built-in translation management through the UI
 
 ## Project Structure
 
 ```text
 app.py
+exporter_app.py
 config.json
 translations.json
 requirements.txt
@@ -31,6 +38,8 @@ viapps_analyzer/
   analyzer.py
   config.py
   data_loader.py
+  exporter_app.py
+  exporter_core.py
   map_utils.py
   plotting.py
   translations.py
@@ -54,6 +63,8 @@ streamlit run app.py
 
 ## Usage
 
+### Comparison workflow
+
 1. Open the app in your browser.
 2. Confirm or update the report directory in the sidebar settings.
 3. Select one or more ViaPPS report files.
@@ -63,6 +74,38 @@ streamlit run app.py
 7. Optionally apply date or coordinate filters.
 8. Review the chart, summary table, correlation table, metadata, and map.
 9. Use the export section for CSV, Excel, chart, or geospatial output.
+
+### Overview workflow
+
+1. Open the app and switch the sidebar workflow to `Overview`.
+2. Set the exporter input/output folders and choose the field groups or individual fields to summarize.
+3. Download the exporter config JSON and the ViaPPS Exporter bundle ZIP.
+4. Run the exporter bundle on a machine that has access to the source report folder.
+5. Load the generated `viapps_overview_dataset.parquet` or `.csv` back into the overview mode.
+6. Optionally load `viapps_overview_dataset.geojson` to display track lines on the map.
+
+The overview dataset includes:
+
+- Per-file identifiers such as display name, source file, and source path
+- Table size and detected table line range
+- Optional metadata fields copied from the original report
+- Start/end and min/max latitude/longitude bounds
+- `track_coordinates_json` with a compact 160-point track preview for map rendering without GeoJSON
+- Per-selected-field summary columns using the `field__count`, `field__mean`, `field__min`, and `field__max` naming pattern
+
+## ViaPPS Exporter
+
+The exporter is a small desktop launcher (`exporter_app.py`) bundled directly from the Streamlit app. Its purpose is to scan a folder of ViaPPS TXT/TSV reports and write overview outputs without opening the full Analyzer UI on that machine.
+
+Typical exporter flow:
+
+1. Download the config JSON and bundle ZIP from the `Overview` workflow.
+2. Extract the ZIP on the target machine.
+3. Install dependencies with `pip install -r requirements.txt`.
+4. Start the exporter with `python exporter_app.py`.
+5. Load the config, confirm folders and output formats, then run the export.
+
+The exporter looks for the most recent `viapps_export_*.json` config in the launcher folder first and then in the user's `Downloads` folder.
 
 ## Data Parsing Notes
 
@@ -110,6 +153,8 @@ Sample ViaPPS-related field entries included by default:
 - Chart PNG/PDF export depends on `kaleido`.
 - GeoPackage and Shapefile export depend on a working GeoPandas driver stack.
 - Shapefile export is delivered as a zip archive because it consists of multiple files.
+- Overview parquet export depends on `pyarrow`.
+- Overview GeoJSON is optional; the overview table can still render a simplified map from `track_coordinates_json`.
 
 ## Assumptions and Extension Points
 
