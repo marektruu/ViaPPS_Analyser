@@ -1,6 +1,8 @@
 ﻿from __future__ import annotations
 
+import io
 from pathlib import Path
+import zipfile
 
 import pandas as pd
 import streamlit as st
@@ -61,8 +63,8 @@ FIELD_TRANSLATION_TEMPLATES = {
 
 
 @st.cache_data(show_spinner=False)
-def cached_file_list(directory: str) -> list[str]:
-    return [str(path) for path in list_tsv_files(directory)]
+def cached_file_list(directory: str, recursive: bool = False) -> list[str]:
+    return [str(path) for path in list_tsv_files(directory, recursive=recursive)]
 
 
 @st.cache_data(show_spinner=False)
@@ -330,11 +332,32 @@ def _load_directory_reports(directory: str) -> list[ViaPPSReport]:
     return [cached_report(path) for path in cached_file_list(directory)]
 
 
+def _load_directory_reports_recursive(directory: str, recursive: bool = False) -> list[ViaPPSReport]:
+    return [cached_report(path) for path in cached_file_list(directory, recursive=recursive)]
+
+
 def _load_uploaded_reports(uploaded_files: list[UploadedFile]) -> list[ViaPPSReport]:
     reports: list[ViaPPSReport] = []
     for uploaded_file in uploaded_files:
         reports.append(cached_uploaded_report(uploaded_file.name, uploaded_file.getvalue()))
     return reports
+
+
+def _load_uploaded_zip_reports(uploaded_zip: UploadedFile | None) -> tuple[list[ViaPPSReport], str | None]:
+    if uploaded_zip is None:
+        return [], None
+    try:
+        archive = zipfile.ZipFile(io.BytesIO(uploaded_zip.getvalue()))
+    except zipfile.BadZipFile:
+        return [], "invalid_zip_file"
+
+    reports: list[ViaPPSReport] = []
+    for member in sorted(archive.namelist()):
+        lower_name = member.lower()
+        if member.endswith("/") or not lower_name.endswith((".txt", ".tsv")):
+            continue
+        reports.append(cached_uploaded_report(member, archive.read(member)))
+    return reports, None
 
 
 def _load_sample_reports() -> tuple[list[ViaPPSReport], Path | None]:
@@ -357,6 +380,12 @@ def run_app() -> None:
         st.session_state.files_loaded = False
     if "directory_reports" not in st.session_state:
         st.session_state.directory_reports = []
+    if "directory_recursive" not in st.session_state:
+        st.session_state.directory_recursive = False
+    if "last_loaded_directory" not in st.session_state:
+        st.session_state.last_loaded_directory = ""
+    if "last_loaded_recursive" not in st.session_state:
+        st.session_state.last_loaded_recursive = False
 
     language = st.sidebar.selectbox(
         tr(translations, config.default_language, "language"),
@@ -367,10 +396,11 @@ def run_app() -> None:
 
     data_source = st.sidebar.radio(
         tr(translations, language, "data_source"),
-        options=["sample", "upload", "directory"],
+        options=["sample", "upload", "zip", "directory"],
         format_func=lambda option: {
             "sample": tr(translations, language, "sample_files"),
             "upload": tr(translations, language, "upload_files"),
+            "zip": tr(translations, language, "zip_file"),
             "directory": tr(translations, language, "local_directory"),
         }[option],
     )
@@ -395,27 +425,51 @@ def run_app() -> None:
             st.info(tr(translations, language, "upload_files_prompt"))
             _render_translation_editor(translations, language)
             return
+    elif data_source == "zip":
+        uploaded_zip = st.sidebar.file_uploader(
+            tr(translations, language, "upload_zip_archive"),
+            type=["zip"],
+            accept_multiple_files=False,
+        )
+        available_reports, zip_error = _load_uploaded_zip_reports(uploaded_zip)
+        if zip_error == "invalid_zip_file":
+            st.warning(tr(translations, language, "invalid_zip_file"))
+            _render_translation_editor(translations, language)
+            return
+        if not available_reports:
+            st.info(tr(translations, language, "upload_zip_prompt"))
+            _render_translation_editor(translations, language)
+            return
     else:
         report_directory = st.sidebar.text_input(
             tr(translations, language, "report_directory"),
             value=st.session_state.report_directory_input,
             key="report_directory_input",
         )
-        if st.sidebar.button(tr(translations, language, "refresh_files")):
+        recursive_scan = st.sidebar.checkbox(
+            tr(translations, language, "include_subfolders"),
+            value=st.session_state.directory_recursive,
+            key="directory_recursive",
+        )
+        should_reload = (
+            not st.session_state.files_loaded
+            or report_directory != st.session_state.last_loaded_directory
+            or recursive_scan != st.session_state.last_loaded_recursive
+        )
+        if st.sidebar.button(tr(translations, language, "refresh_files")) or should_reload:
             cached_file_list.clear()
             cached_report.clear()
-            st.session_state.directory_reports = _load_directory_reports(report_directory)
+            st.session_state.directory_reports = _load_directory_reports_recursive(report_directory, recursive=recursive_scan)
             st.session_state.files_loaded = True
+            st.session_state.last_loaded_directory = report_directory
+            st.session_state.last_loaded_recursive = recursive_scan
             config = _persist_report_directory(config, report_directory)
-        if not st.session_state.files_loaded:
-            st.info(tr(translations, language, "refresh_to_load_files"))
-            _render_translation_editor(translations, language)
-            return
         available_reports = list(st.session_state.directory_reports)
         if not available_reports:
             st.warning(f"{tr(translations, language, 'no_files_found')} {report_directory}")
             _render_translation_editor(translations, language)
             return
+        st.sidebar.caption(f"{tr(translations, language, 'files_found_count')}: {len(available_reports)}")
 
     file_labels = _build_label_map(available_reports)
     selected_labels = st.sidebar.multiselect(

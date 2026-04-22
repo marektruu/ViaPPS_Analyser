@@ -972,10 +972,30 @@
       "en": "Upload report files",
       "et": "Laadi raportifailid üles"
     },
+    "upload_zip_archive": {
+      "no": "Last opp ZIP-arkiv",
+      "en": "Upload ZIP archive",
+      "et": "Laadi ZIP-arhiiv üles"
+    },
+    "upload_zip_prompt": {
+      "no": "Last opp ett ZIP-arkiv som inneholder TSV/TXT-rapportfiler.",
+      "en": "Upload a ZIP archive that contains TSV/TXT report files.",
+      "et": "Laadi üles ZIP-arhiiv, mis sisaldab TSV/TXT raportifaile."
+    },
     "value": {
       "no": "Verdi",
       "en": "Value",
       "et": "Väärtus"
+    },
+    "invalid_zip_file": {
+      "no": "Den opplastede filen er ikke et gyldig ZIP-arkiv.",
+      "en": "The uploaded file is not a valid ZIP archive.",
+      "et": "Üles laaditud fail ei ole korrektne ZIP-arhiiv."
+    },
+    "zip_file": {
+      "no": "ZIP-arkiv",
+      "en": "ZIP archive",
+      "et": "ZIP-arhiiv"
     }
   }
 }
